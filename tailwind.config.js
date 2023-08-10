@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        'imagen': "url('./src/assets/background.png')"
+        'imagen': "url('/src/assets/background.png')"
       },
       animation: {
         ["infinite-slider"]: "infiniteSlider 20s linear infinite",
