@@ -1,0 +1,42 @@
+---
+import { siteData, whatsappUrl } from '../../data/siteData';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+---
+
+<!-- Único bloque de color fuerte de la página -->
+<section id="proceso" aria-labelledby="proc-title" class="bg-(--accent-block) text-white">
+  <div class="container-page py-[72px] lg:py-28">
+    <div class="flex flex-col gap-3.5 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+      <h2 id="proc-title" class="text-[40px] leading-none font-extrabold tracking-[-0.035em] lg:text-[64px]">
+        Cómo trabajamos
+      </h2>
+      <p class="max-w-[420px] text-[17px] leading-[1.55] lg:text-lg">
+        De tu primer mensaje al pedido terminado, en cuatro pasos y con una prueba antes de imprimir.
+      </p>
+    </div>
+
+    <ol class="mt-10 grid gap-9 md:grid-cols-2 md:gap-8 lg:mt-16 lg:grid-cols-4">
+      {siteData.process.map((st, i) => (
+        <li class="border-t-2 border-white pt-[18px] lg:pt-6">
+          <span aria-hidden="true" class="block font-sans text-[64px] leading-none font-extrabold tracking-[-0.04em] [font-stretch:112%] lg:text-[88px]">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="mt-3.5 mb-2 text-[22px] leading-[1.2] font-bold [font-stretch:106%] lg:mt-5 lg:mb-2.5 lg:text-2xl">
+            {st.titulo}
+          </h3>
+          <p class="text-base leading-[1.6]">{st.descripcion}</p>
+        </li>
+      ))}
+    </ol>
+
+    <a
+      href={whatsappUrl()}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="btn-anim btn-anim--light mt-10 flex h-14 items-center justify-center gap-2.5 rounded-xl bg-white px-6 text-base font-bold text-[#0f1115] transition-colors hover:bg-[#f8f8f6] focus-visible:outline-white sm:inline-flex lg:mt-14"
+    >
+      <WhatsAppIcon fill="#047857" />
+      Empezar por WhatsApp
+    </a>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+---
+interface Props {
+  class?: string;
+  /** "auto" sigue el tema (.dark); "dark" fuerza la versión para fondos oscuros */
+  variant?: 'auto' | 'dark';
+}
+
+const { class: className = 'h-9', variant = 'auto' } = Astro.props;
+const alt = 'Puka & Yurac Impresiones';
+---
+
+{variant === 'dark' ? (
+  <img src="/assets/logo-dark.png" alt={alt} width="710" height="176" class:list={['w-auto object-contain', className]} />
+) : (
+  <>
+    <img src="/assets/logo-light.png" alt={alt} width="710" height="176" class:list={['w-auto object-contain dark:hidden', className]} />
+    <img src="/assets/logo-dark.png" alt={alt} width="710" height="176" class:list={['w-auto object-contain hidden dark:block', className]} />
+  </>
+)}

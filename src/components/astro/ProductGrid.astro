@@ -1,0 +1,232 @@
+---
+import ProductCard from './ProductCard.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { productosService } from '../../services/productos.service';
+import { selectProductos, type GridMode } from '../../lib/productos';
+import { whatsappUrl } from '../../data/siteData';
+import type { Producto } from '../../types/producto';
+
+interface Props {
+  /** "destacados": solo destacados (o los primeros si no hay), con límite. "todos": catálogo completo. */
+  mode: GridMode;
+  limit?: number;
+  /** "catalogo": filtros por categoría (lee ?cat=) y títulos h2. "landing": sin filtros, títulos h3. */
+  variant?: 'landing' | 'catalogo';
+}
+
+const { mode, limit = 6, variant = 'landing' } = Astro.props;
+const withFilters = variant === 'catalogo';
+
+// En build se leen de Supabase; en el navegador se refresca con datos en vivo.
+const all: Producto[] = (await productosService.getPublicProductos()) ?? [];
+const productos = selectProductos(all, mode, limit);
+const categorias = [...new Set(productos.map((p) => p.categoria))].map((c) => ({
+  nombre: c,
+  total: productos.filter((p) => p.categoria === c).length,
+}));
+
+// Tarjeta molde para clonar en el cliente
+const placeholder: Producto = { id: 0, titulo: '', categoria: '', descripcion: '', imagen: '', acabados: [], destacado: false };
+
+const pillBase =
+  'filter-btn inline-flex h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[15px] font-semibold transition-colors ' +
+  'aria-pressed:bg-(--text-primary) aria-pressed:text-(--bg-page) ' +
+  'aria-[pressed=false]:ui-text-secondary aria-[pressed=false]:hover:bg-(--bg-elevated) aria-[pressed=false]:hover:ui-text-primary';
+const countLabel = (n: number) => `${n} ${n === 1 ? 'producto' : 'productos'}`;
+---
+
+<div class="product-grid-root" data-mode={mode} data-limit={limit} data-variant={variant}>
+  {withFilters && (
+    <div class="product-toolbar border-y ui-border" hidden={productos.length === 0}>
+      <div class="container-page flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between md:gap-6">
+        <div role="group" aria-label="Filtrar por categoría" class="product-filters flex flex-wrap gap-1" data-pill-class={pillBase}>
+          <button type="button" data-filter="Todos" aria-pressed="true" class={pillBase}>
+            Todos <span class="filter-count font-medium opacity-75">{productos.length}</span>
+          </button>
+          {categorias.map((c) => (
+            <button type="button" data-filter={c.nombre} aria-pressed="false" class={pillBase}>
+              {c.nombre} <span class="filter-count font-medium opacity-75">{c.total}</span>
+            </button>
+          ))}
+        </div>
+        <p class="product-count shrink-0 text-[15px] whitespace-nowrap ui-text-secondary" aria-live="polite">
+          {countLabel(productos.length)}
+        </p>
+      </div>
+    </div>
+  )}
+
+  <div class:list={{ 'container-page pt-10 lg:pt-12': withFilters }}>
+    <ul
+      class:list={[
+        'product-grid grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 lg:grid-cols-3',
+        withFilters ? 'lg:gap-y-14' : 'lg:gap-y-12',
+      ]}
+      hidden={productos.length === 0}
+    >
+      {productos.map((p) => (
+        <li class="product-item" data-category={p.categoria}>
+          <ProductCard producto={p} variant={variant} />
+        </li>
+      ))}
+    </ul>
+
+    <div class="product-empty photo-plate photo-plate--empty rounded-2xl! p-8! lg:rounded-[20px]! lg:p-12!" hidden={productos.length > 0}>
+      <p class="font-sans text-[26px] leading-[1.1] font-extrabold tracking-[-0.02em] text-[#0f1115] [font-stretch:112%] lg:text-[32px]">
+        Estamos actualizando nuestro catálogo
+      </p>
+      <p class="mt-3 max-w-[520px] text-base leading-[1.55] text-[#4a4d52] lg:text-[17px]">
+        Cuéntanos qué necesitas imprimir y te enviamos una cotización a medida.
+      </p>
+      <a
+        href={whatsappUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-anim mt-6 inline-flex h-14 items-center gap-2.5 rounded-xl bg-(--whatsapp) px-6 text-base font-bold text-white transition-colors hover:bg-[#065f46]"
+      >
+        <WhatsAppIcon />
+        Escríbenos por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <template class="product-card-template">
+    <ProductCard producto={placeholder} variant={variant} />
+  </template>
+</div>
+
+<script>
+  import { productosService } from '../../services/productos.service';
+  import { selectProductos, type GridMode } from '../../lib/productos';
+  import { imagenOptimizada } from '../../lib/imagen';
+  import { whatsappProductoUrl } from '../../data/siteData';
+  import type { Producto } from '../../types/producto';
+
+  const countLabel = (n: number) => `${n} ${n === 1 ? 'producto' : 'productos'}`;
+  const normalizar = (s: string) =>
+    s.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+
+  function fillCard(template: HTMLTemplateElement, p: Producto) {
+    const card = (template.content.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement;
+    card.setAttribute('data-category', p.categoria);
+
+    const src = imagenOptimizada(p.imagen);
+    const plate = card.querySelector<HTMLElement>('.card-plate');
+    const plateEmpty = card.querySelector<HTMLElement>('.card-plate-empty');
+    const img = card.querySelector<HTMLImageElement>('.card-img');
+    if (plate) plate.hidden = !src;
+    if (plateEmpty) plateEmpty.hidden = !!src;
+    if (img) {
+      if (src) img.src = src;
+      img.alt = p.titulo;
+    }
+
+    const setText = (selector: string, text: string) => {
+      const el = card.querySelector<HTMLElement>(selector);
+      if (el) el.textContent = text;
+      return el;
+    };
+    setText('.card-empty-name', p.titulo);
+    setText('.card-cat', p.categoria);
+    setText('.card-title', p.titulo);
+    const desc = setText('.card-desc', p.descripcion ?? '');
+    if (desc) desc.hidden = !p.descripcion;
+    setText('.card-spec', p.acabados.slice(0, 2).join(' · '));
+
+    const cta = card.querySelector<HTMLAnchorElement>('.card-cta');
+    if (cta) {
+      cta.href = whatsappProductoUrl(p.titulo);
+      cta.setAttribute('aria-label', `Cotizar este producto: ${p.titulo}, por WhatsApp`);
+    }
+
+    const li = document.createElement('li');
+    li.className = 'product-item';
+    li.setAttribute('data-category', p.categoria);
+    li.append(card);
+    return li;
+  }
+
+  function setup(root: HTMLElement) {
+    const grid = root.querySelector<HTMLElement>('.product-grid');
+    const empty = root.querySelector<HTMLElement>('.product-empty');
+    const template = root.querySelector<HTMLTemplateElement>('.product-card-template');
+    const toolbar = root.querySelector<HTMLElement>('.product-toolbar');
+    const filters = root.querySelector<HTMLElement>('.product-filters');
+    const count = root.querySelector<HTMLElement>('.product-count');
+    if (!grid || !empty || !template) return;
+
+    let active = 'Todos';
+
+    function applyFilter(filter: string, updateUrl = false) {
+      if (!filters) return;
+      const buttons = [...filters.querySelectorAll<HTMLButtonElement>('.filter-btn')];
+      const target = buttons.find((b) => normalizar(b.dataset.filter ?? '') === normalizar(filter));
+      active = target?.dataset.filter ?? 'Todos';
+
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === active)));
+      let visibles = 0;
+      grid!.querySelectorAll<HTMLElement>('.product-item').forEach((item) => {
+        const match = active === 'Todos' || item.dataset.category === active;
+        item.hidden = !match;
+        if (match) visibles++;
+      });
+      if (count) count.textContent = countLabel(visibles);
+
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (active === 'Todos') url.searchParams.delete('cat');
+        else url.searchParams.set('cat', active);
+        history.replaceState(null, '', url);
+      }
+    }
+
+    function renderFilters(productos: Producto[]) {
+      if (!filters) return;
+      const pillClass = filters.dataset.pillClass ?? '';
+      const categorias = [...new Set(productos.map((p) => p.categoria))];
+      const pill = (value: string, total: number) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = pillClass;
+        btn.dataset.filter = value;
+        btn.setAttribute('aria-pressed', 'false');
+        const n = document.createElement('span');
+        n.className = 'filter-count font-medium opacity-75';
+        n.textContent = String(total);
+        btn.append(`${value} `, n);
+        return btn;
+      };
+      filters.replaceChildren(
+        pill('Todos', productos.length),
+        ...categorias.map((c) => pill(c, productos.filter((p) => p.categoria === c).length))
+      );
+    }
+
+    filters?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('.filter-btn');
+      if (btn) applyFilter(btn.dataset.filter ?? 'Todos', true);
+    });
+
+    // Preselección desde /productos?cat=<categoria>
+    const initial = new URLSearchParams(window.location.search).get('cat');
+    if (initial) applyFilter(initial);
+
+    async function refresh() {
+      const all = await productosService.getPublicProductos();
+      if (!all) return; // error de red: se queda lo renderizado en el build
+
+      const productos = selectProductos(all, root.dataset.mode as GridMode, Number(root.dataset.limit) || 6);
+      grid!.replaceChildren(...productos.map((p) => fillCard(template!, p)));
+      grid!.hidden = productos.length === 0;
+      empty!.hidden = productos.length > 0;
+      if (toolbar) toolbar.hidden = productos.length === 0;
+
+      renderFilters(productos);
+      applyFilter(active === 'Todos' && initial ? initial : active);
+    }
+
+    refresh();
+  }
+
+  document.querySelectorAll<HTMLElement>('.product-grid-root').forEach(setup);
+</script>

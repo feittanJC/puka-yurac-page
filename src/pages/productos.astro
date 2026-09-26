@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/astro/Header.astro';
+import Footer from '../components/astro/Footer.astro';
+import ProductGrid from '../components/astro/ProductGrid.astro';
+import WhatsAppIcon from '../components/astro/WhatsAppIcon.astro';
+import { siteData, whatsappUrl } from '../data/siteData';
+---
+
+<Layout
+  title={`Catálogo | ${siteData.name}`}
+  description="Agendas, cuadernos, talonarios, folletos y calendarios hechos en nuestro taller de Breña. Cotiza cualquier producto por WhatsApp."
+>
+  <Header current="catalogo" />
+  <main id="contenido">
+    <section aria-labelledby="cat-title" class="container-page pt-8 lg:pt-14">
+      <nav aria-label="Ruta" class="text-sm ui-text-secondary">
+        <ol class="flex items-center">
+          <li>
+            <a href="/" class="inline-flex min-h-11 items-center rounded ui-text-secondary underline underline-offset-4">Inicio</a>
+          </li>
+          <li aria-hidden="true" class="px-2">/</li>
+          <li aria-current="page">Catálogo</li>
+        </ol>
+      </nav>
+      <div class="mt-2 flex flex-col gap-3 lg:mt-4 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+        <h1 id="cat-title" class="text-[40px] leading-none font-extrabold tracking-[-0.035em] lg:text-[72px]">Catálogo</h1>
+        <p class="max-w-[460px] text-base leading-[1.55] ui-text-secondary lg:text-[17px]">
+          Todo lo que imprimimos en el taller. Elige un producto y cotízalo por WhatsApp; te respondemos con precio y prueba.
+        </p>
+      </div>
+    </section>
+
+    <div class="mt-8 lg:mt-10">
+      <ProductGrid mode="todos" variant="catalogo" />
+    </div>
+
+    <section aria-labelledby="cat-cta" class="container-page mt-20 lg:mt-24">
+      <div class="flex flex-col gap-6 border-t border-(--text-primary) py-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:py-12">
+        <div>
+          <h2 id="cat-cta" class="text-[28px] leading-[1.05] font-extrabold tracking-[-0.03em] lg:text-4xl">
+            ¿No <span class="text-gradient-red">encuentras</span> lo que buscas?
+          </h2>
+          <p class="mt-2.5 text-base ui-text-secondary lg:text-[17px]">
+            Cuéntanos tu idea y te decimos cómo hacerla en el taller.
+          </p>
+        </div>
+        <a
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex h-14 items-center justify-center gap-2.5 rounded-xl bg-(--whatsapp) px-6 text-base font-bold whitespace-nowrap text-white transition-colors hover:bg-[#065f46]"
+        >
+          <WhatsAppIcon />
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

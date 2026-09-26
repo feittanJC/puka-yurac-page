@@ -1,0 +1,49 @@
+---
+import { siteData } from '../../data/siteData';
+import Logo from './Logo.astro';
+
+const links = [
+  { href: '/', label: 'Inicio' },
+  { href: '/productos', label: 'Catálogo' },
+  { href: '/#servicios', label: 'Servicios' },
+  { href: '/#nosotros', label: 'Nosotros' },
+  { href: '/#contacto', label: 'Contacto' },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-(--footer-bg) text-[#f0f1f5] [--action:#ef4444]">
+  <div class="container-page pt-14 pb-[104px] lg:pt-[72px] lg:pb-10">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16">
+      <div>
+        <a href="/" aria-label={`${siteData.name}, ir al inicio`} class="inline-block rounded">
+          <Logo variant="dark" class="h-9 lg:h-11" />
+        </a>
+        <p class="mt-4 max-w-[360px] text-[15px] leading-[1.6] text-[#b0b2b8] lg:mt-5">
+          Imprenta y taller gráfico en Breña, Lima. Más de 10 años de oficio y envíos a todo el Perú.
+        </p>
+      </div>
+
+      <nav aria-label="Pie de página" class="grid grid-cols-2 text-[15px] lg:flex lg:flex-col lg:gap-1">
+        {links.map((l) => (
+          <a href={l.href} class="flex min-h-11 items-center rounded text-[#f0f1f5] hover:underline hover:underline-offset-4 lg:min-h-9">
+            {l.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="text-[15px] leading-[1.8] text-[#b0b2b8]">
+        <a href={siteData.phoneHref} class="inline-flex min-h-11 items-center rounded text-lg font-bold text-[#f0f1f5] lg:min-h-0">
+          {siteData.phone}
+        </a>
+        <span class="block">{siteData.address}</span>
+        <span class="block">{siteData.hoursShort}</span>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-col gap-1 border-t border-[#2b2e36] pt-6 text-sm text-[#b0b2b8] sm:flex-row sm:justify-between lg:mt-16">
+      <span>© {year} {siteData.name}</span>
+      <span>Envíos a todo el Perú</span>
+    </div>
+  </div>
+</footer>

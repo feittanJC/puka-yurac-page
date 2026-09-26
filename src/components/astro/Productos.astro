@@ -1,0 +1,36 @@
+---
+import ProductGrid from './ProductGrid.astro';
+---
+
+<section id="productos" aria-labelledby="dest-title" class="container-page pt-[72px] lg:pt-28">
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+    <h2
+      id="dest-title"
+      class="text-[34px] leading-[1.02] font-extrabold tracking-[-0.03em] lg:text-[52px] lg:leading-none"
+    >
+      Productos <span class="text-gradient-red">destacados</span>
+    </h2>
+    <div class="flex items-center gap-8">
+      <p class="max-w-[380px] text-base leading-[1.55] ui-text-secondary">
+        Trabajos reales que salieron de nuestro taller. Cotiza cualquiera por WhatsApp con un toque.
+      </p>
+      <a
+        href="/productos"
+        class="link-anim hidden rounded text-[15px] font-bold whitespace-nowrap ui-text-primary lg:inline"
+      >
+        Ver catálogo completo
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-8 lg:mt-12">
+    <ProductGrid mode="destacados" limit={3} />
+  </div>
+
+  <a
+    href="/productos"
+    class="mt-6 flex h-13 items-center justify-center rounded-xl bg-(--bg-elevated) text-base font-bold ui-text-primary lg:hidden"
+  >
+    Ver catálogo completo
+  </a>
+</section>

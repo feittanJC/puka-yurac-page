@@ -1,0 +1,38 @@
+---
+import { siteData } from '../../data/siteData';
+---
+
+<section id="servicios" aria-labelledby="serv-title" class="container-page py-[72px] lg:py-28">
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <h2 id="serv-title" class="text-[34px] leading-[1.02] font-extrabold tracking-[-0.03em] lg:text-[52px] lg:leading-none">
+        Servicios
+      </h2>
+      <p class="mt-3 max-w-[340px] text-base leading-[1.55] ui-text-secondary lg:mt-5 lg:text-[17px]">
+        Todo el proceso en un mismo taller, desde tu archivo hasta el acabado final.
+      </p>
+      <figure class="mt-10 hidden lg:block">
+        <div class="photo-plate h-[300px] p-8!">
+          <img src="/assets/fotos/calendario.webp" alt="Calendario de escritorio impreso y anillado en el taller" width="800" height="800" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="mt-3 text-sm ui-text-tertiary">Calendario de escritorio con anillado superior.</figcaption>
+      </figure>
+    </div>
+
+    <ol class="border-b ui-border">
+      {siteData.services.map((s, i) => (
+        <li class="svc-row grid grid-cols-[32px_minmax(0,1fr)] items-baseline gap-x-0 gap-y-2.5 border-t ui-border py-6 md:grid-cols-[72px_minmax(0,1fr)_minmax(0,1.15fr)] md:gap-6 lg:py-8">
+          <span class="font-sans text-[15px] font-bold tabular-nums text-(--primary) lg:text-lg">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="text-2xl leading-[1.15] font-bold [font-stretch:106%] lg:text-[30px] lg:leading-[1.1] lg:tracking-[-0.02em] lg:[font-stretch:108%]">
+            {s.titulo}
+          </h3>
+          <p class="col-start-2 text-base leading-[1.55] ui-text-secondary md:col-start-auto lg:text-[17px]">
+            {s.descripcion}
+          </p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

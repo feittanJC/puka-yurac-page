@@ -1,0 +1,476 @@
+@import "tailwindcss";
+
+/* dark: sigue la clase .dark del <html> (ThemeToggle), no la preferencia del sistema */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: 'Archivo', sans-serif;
+    --font-body: 'Manrope', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* LIGHT THEME (Alto contraste industrial) */
+    --bg-page: #f8f8f6;
+    --bg-surface: #ffffff;
+    --bg-elevated: #efeede;
+    --bg-card: #ffffff;
+    --bg-header: rgba(248, 248, 246, 0.9);
+
+    --text-primary: #0f1115;
+    --text-secondary: #4a4d52;
+    --text-tertiary: #5f6268;
+
+    --border-main: #dcdce0;
+    --border-strong: #b5b5ba;
+
+    --primary-container: #e60000;
+    --on-primary-container: #ffffff;
+    --primary: #c00000;
+
+    --badge-bg: rgba(230, 0, 0, 0.08);
+    --badge-text: #c00000;
+    --badge-border: rgba(230, 0, 0, 0.3);
+
+    /* Rediseño 2026 */
+    --bg-plate: #efede6;          /* plano papel detrás de fotos recortadas */
+    --action: #dc2626;            /* CTA principal */
+    --action-hover: #b91c1c;
+    --accent-block: #e60000;      /* bloque rojo "Cómo trabajamos" */
+    --accent-text: #dc2626;       /* texto/subrayado rojo */
+    --whatsapp: #047857;
+    --footer-bg: #09090b;
+    --border-input: #8a8d93;
+  }
+
+  .dark {
+    /* DARK THEME (Alto contraste industrial) */
+    --bg-page: #0f1115;
+    --bg-surface: #16181d;
+    --bg-elevated: #1e2026;
+    --bg-card: #1d2026;
+    --bg-header: rgba(15, 17, 21, 0.9);
+
+    --text-primary: #f0f1f5;
+    --text-secondary: #b0b2b8;
+    --text-tertiary: #9a9ca3;
+
+    --border-main: #2b2e36;
+    --border-strong: #404450;
+
+    --primary-container: #e60000;
+    --on-primary-container: #fff7f5;
+    --primary: #ffb4a8;
+
+    --badge-bg: rgba(230, 0, 0, 0.18);
+    --badge-text: #ffb4a8;
+    --badge-border: rgba(230, 0, 0, 0.4);
+
+    --bg-plate: #e9e6de;          /* sigue claro: muestras impresas sobre la mesa */
+    --accent-text: #ef4444;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--action);
+    outline-offset: 3px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-stretch: 112%;
+  }
+}
+
+/* Theme utilities (usan los tokens de :root / .dark; soportan variantes como hover:) */
+@utility ui-page-bg {
+  background-color: var(--bg-page);
+}
+
+@utility ui-surface-bg {
+  background-color: var(--bg-surface);
+}
+
+@utility ui-elevated-bg {
+  background-color: var(--bg-elevated);
+}
+
+@utility ui-text-primary {
+  color: var(--text-primary);
+}
+
+@utility ui-text-secondary {
+  color: var(--text-secondary);
+}
+
+@utility ui-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+@utility ui-border {
+  border-color: var(--border-main);
+
+  /* También colorea los separadores de divide-y / divide-x */
+  & > :not(:last-child) {
+    border-color: var(--border-main);
+  }
+}
+
+/* Plano papel para fotos recortadas sobre blanco (multiply borra el fondo blanco) */
+.photo-plate {
+  background-color: var(--bg-plate);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.photo-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: #e60000;
+  border-radius: 4px;
+}
+
+/* Glassmorphism Navigation */
+.glass-nav {
+  background-color: var(--bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-main);
+}
+
+/* Text Gradients */
+.text-gradient-red {
+  background: linear-gradient(135deg, #e60000 0%, #ff5252 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .text-gradient-red {
+  background: linear-gradient(135deg, #ffffff 0%, #ffb4a8 50%, #e60000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Industrial Paper / Bento Cards High Contrast */
+.paper-card, .bento-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-main);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paper-card:hover, .bento-card:hover {
+  border-color: #e60000;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px -8px rgba(230, 0, 0, 0.3);
+}
+
+/* Editorial Badges */
+.editorial-tag {
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  border: 1px solid var(--badge-border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Glow Shadow */
+.glow-shadow:hover {
+  box-shadow: 0 0 20px rgba(230, 0, 0, 0.4);
+}
+
+/* Marquee Infinite Loop Track */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+/* ---------- Rediseño 2026: utilidades de la parte pública ---------- */
+
+/* Contenedor de página: 1440px máx, gutter 20 / 40 / 80px */
+@utility container-page {
+  margin-inline: auto;
+  max-width: 1440px;
+  padding-inline: 20px;
+  @media (width >= 768px) {
+    padding-inline: 40px;
+  }
+  @media (width >= 1280px) {
+    padding-inline: 80px;
+  }
+}
+
+/* Los anclajes (#servicios, #contacto…) no quedan tapados por el header fijo */
+section[id] {
+  scroll-margin-top: 88px;
+}
+
+/* Tarjeta de producto sin foto: plano con el nombre */
+.photo-plate--empty {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   Micro-interacciones (rediseño 2026)
+   ============================================================ */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Botones rellenos: se elevan, sombra del color del botón, la flecha avanza y el ícono de WhatsApp saluda */
+.btn-anim {
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out),
+    background-color 0.2s ease;
+  will-change: transform;
+}
+.btn-anim:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -8px rgba(15, 17, 21, 0.45);
+}
+.btn-anim:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+  transition-duration: 0.08s;
+}
+.btn-anim svg {
+  transition: transform 0.3s var(--ease-out);
+}
+.btn-anim:hover svg[data-arrow] {
+  transform: translateX(4px);
+}
+.btn-anim:hover svg:not([data-arrow]) {
+  animation: wa-wiggle 0.5s var(--ease-out);
+}
+.btn-anim--light:hover {
+  box-shadow: 0 12px 26px -10px rgba(0, 0, 0, 0.45);
+}
+@keyframes wa-wiggle {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-12deg); }
+  60% { transform: rotate(8deg); }
+}
+
+/* Enlaces: subrayado que se "dibuja" en rojo de izquierda a derecha sobre la línea base */
+.link-anim {
+  text-decoration: none;
+  background-image:
+    linear-gradient(var(--accent-text), var(--accent-text)),
+    linear-gradient(var(--link-base, currentColor), var(--link-base, currentColor));
+  background-repeat: no-repeat;
+  background-size: 0% 2px, 100% 1px;
+  background-position: 0 calc(100% - 0.55em), 0 calc(100% - 0.55em);
+  transition: background-size 0.35s var(--ease-out), color 0.2s ease;
+}
+.link-anim:hover,
+.link-anim:focus-visible {
+  background-size: 100% 2px, 100% 1px;
+}
+.link-anim--accent {
+  --link-base: color-mix(in srgb, var(--accent-text) 35%, transparent);
+}
+/* En enlaces inline-flex la línea va bajo el texto, no bajo la caja de 44px */
+.link-anim.inline-flex,
+.link-anim.flex {
+  background-origin: content-box;
+  background-position: 0 calc(50% + 0.85em), 0 calc(50% + 0.85em);
+}
+
+/* Índice de categorías del hero: el nombre avanza y una línea roja recorre el borde superior */
+.cat-link {
+  position: relative;
+}
+.cat-link::before {
+  content: "";
+  position: absolute;
+  inset: -1px auto auto 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.cat-link:hover::before,
+.cat-link:focus-visible::before {
+  transform: scaleX(1);
+}
+.cat-link .cat-name,
+.cat-link .cat-num {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-out);
+}
+.cat-link:hover .cat-name,
+.cat-link:focus-visible .cat-name {
+  transform: translateX(6px);
+}
+.cat-link:hover .cat-num {
+  transform: translateX(3px);
+}
+
+/* Lista de servicios: el título avanza y el borde superior se tiñe de rojo */
+.svc-row {
+  position: relative;
+}
+.svc-row::before {
+  content: "";
+  position: absolute;
+  inset: -1px auto auto 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease-out);
+}
+.svc-row:hover::before {
+  transform: scaleX(1);
+}
+.svc-row h3 {
+  transition: transform 0.35s var(--ease-out);
+}
+.svc-row:hover h3 {
+  transform: translateX(8px);
+}
+
+/* Tarjetas de producto: la foto hace un zoom suave */
+.product-card .card-img {
+  transition: transform 0.6s var(--ease-out);
+}
+.product-card:hover .card-img {
+  transform: scale(1.05);
+}
+
+/* FAQ: el signo gira al abrir/cerrar */
+.faq-sign {
+  display: inline-block;
+  transition: transform 0.3s var(--ease-out);
+}
+.faq-toggle[aria-expanded="true"] .faq-sign {
+  transform: rotate(180deg);
+}
+.faq-toggle:hover .faq-sign {
+  color: var(--accent-text);
+}
+
+/* Botón flotante de WhatsApp: crece al pasar el mouse y emite un pulso suave cada tanto */
+.fab-anim {
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background-color 0.2s ease;
+}
+.fab-anim:hover {
+  transform: scale(1.08);
+}
+.fab-anim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--whatsapp) 55%, transparent);
+  animation: fab-pulse 3.2s var(--ease-out) 2s infinite;
+  pointer-events: none;
+}
+@keyframes fab-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--whatsapp) 55%, transparent); }
+  45%, 100% { box-shadow: 0 0 0 16px transparent; }
+}
+
+/* Secciones que aparecen al hacer scroll (solo si JS marcó <html class="js-reveal">) */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.js-reveal [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-anim,
+  .btn-anim svg,
+  .link-anim,
+  .cat-link::before,
+  .cat-link .cat-name,
+  .cat-link .cat-num,
+  .svc-row::before,
+  .svc-row h3,
+  .product-card .card-img,
+  .faq-sign,
+  .fab-anim {
+    transition: none;
+  }
+  .btn-anim:hover,
+  .fab-anim:hover,
+  .product-card:hover .card-img {
+    transform: none;
+  }
+  .btn-anim:hover svg:not([data-arrow]),
+  .fab-anim::after {
+    animation: none;
+  }
+  .js-reveal [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Modal de producto del admin: aparece con fundido y leve escala */
+.modal-backdrop {
+  animation: modal-fade 0.2s ease-out;
+}
+.modal-panel {
+  animation: modal-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes modal-fade {
+  from { opacity: 0; }
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-panel {
+    animation: none;
+  }
+}

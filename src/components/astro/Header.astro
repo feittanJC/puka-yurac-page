@@ -1,0 +1,175 @@
+---
+import { siteData, whatsappUrl } from '../../data/siteData';
+import ThemeToggle from './ThemeToggle.astro';
+import NavbarMobile from './NavbarMobile.astro';
+import Logo from './Logo.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+
+export type NavKey = 'inicio' | 'nosotros' | 'catalogo' | 'servicios' | 'contacto';
+
+interface Props {
+  /** Página actual para marcar el enlace activo */
+  current?: NavKey;
+}
+
+const { current = 'inicio' } = Astro.props;
+
+// Mismo orden en que aparecen las secciones en la landing.
+// En la home los enlaces son anclas (#) para desplazarse sin recargar; en otras páginas llevan a /#seccion.
+const onHome = current === 'inicio';
+const onCatalog = current === 'catalogo';
+const links: { href: string; label: string; key?: NavKey }[] = [
+  { href: onHome ? '#inicio' : '/', label: 'Inicio', key: 'inicio' },
+  { href: onHome ? '#productos' : onCatalog ? '#contenido' : '/productos', label: 'Catálogo', key: 'catalogo' },
+  { href: onHome ? '#servicios' : '/#servicios', label: 'Servicios', key: 'servicios' },
+  { href: onHome ? '#nosotros' : '/#nosotros', label: 'Nosotros', key: 'nosotros' },
+  { href: onHome ? '#contacto' : '/#contacto', label: 'Contacto', key: 'contacto' },
+];
+---
+
+<header class="sticky top-0 z-40 w-full border-b ui-border ui-page-bg">
+  <div class="container-page flex h-[68px] items-center justify-between gap-6 lg:h-[88px]">
+    <a href={onHome ? "#inicio" : "/"} aria-label={`${siteData.name}, ir al inicio`} class="block shrink-0 rounded">
+      <Logo class="h-[34px] lg:h-11" />
+    </a>
+
+    <nav
+      aria-label="Principal"
+      data-nav
+      data-current={current}
+      class="relative hidden items-center gap-9 text-[15px] font-semibold lg:flex"
+    >
+      {links.map((l) => (
+        <a
+          href={l.href}
+          data-key={l.key}
+          aria-current={l.key === current ? 'page' : undefined}
+          class="nav-link relative rounded py-2 ui-text-secondary transition-colors duration-200 hover:ui-text-primary aria-[current=page]:ui-text-primary"
+        >
+          {l.label}
+        </a>
+      ))}
+      <!-- Línea indicadora: se desliza al enlace en hover y sigue a la sección visible -->
+      <span
+        data-nav-indicator
+        aria-hidden="true"
+        class="pointer-events-none absolute bottom-0 left-0 h-0.5 w-0 rounded-full bg-(--accent-text) opacity-0"
+      ></span>
+    </nav>
+
+    <div class="flex items-center gap-1 lg:gap-5">
+      <a
+        href={siteData.phoneHref}
+        class="inline-flex min-h-11 items-center rounded px-2 text-sm font-bold tabular-nums ui-text-primary lg:hidden"
+      >
+        {siteData.phoneShort}
+      </a>
+
+      <div class="hidden lg:block">
+        <ThemeToggle />
+      </div>
+      <a
+        href={whatsappUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-anim hidden h-12 items-center gap-2.5 rounded-xl bg-(--whatsapp) px-5 text-[15px] font-bold text-white transition-colors hover:bg-[#065f46] lg:inline-flex"
+      >
+        <WhatsAppIcon />
+        Escríbenos
+      </a>
+      <NavbarMobile links={links} current={current} />
+    </div>
+  </div>
+</header>
+
+<style>
+  [data-nav-indicator] {
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-nav-indicator] { transition: none; }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const indicator = nav?.querySelector<HTMLElement>('[data-nav-indicator]');
+
+  if (nav && indicator) {
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('.nav-link')];
+    const byKey = (key: string | null) => links.find((l) => l.dataset.key === key) ?? null;
+    let active = byKey(nav.dataset.current ?? null);
+
+    const moveTo = (link: HTMLElement | null) => {
+      if (!link) {
+        indicator.style.opacity = '0';
+        return;
+      }
+      indicator.style.width = `${link.offsetWidth}px`;
+      indicator.style.transform = `translateX(${link.offsetLeft}px)`;
+      indicator.style.opacity = '1';
+    };
+
+    const setActive = (link: HTMLAnchorElement | null) => {
+      if (!link || link === active) return;
+      active?.removeAttribute('aria-current');
+      link.setAttribute('aria-current', 'page');
+      active = link;
+      if (!nav.matches(':hover')) moveTo(active);
+    };
+
+    // Hover: la línea se desliza al enlace; al salir vuelve al activo
+    links.forEach((l) => {
+      l.addEventListener('mouseenter', () => moveTo(l));
+      l.addEventListener('focus', () => moveTo(l));
+    });
+    nav.addEventListener('mouseleave', () => moveTo(active));
+    nav.addEventListener('focusout', (e) => {
+      if (!nav.contains(e.relatedTarget as Node)) moveTo(active);
+    });
+
+    // Scroll-spy (solo en la home): el enlace activo sigue a la sección visible
+    const sectionToKey: Record<string, string> = {
+      inicio: 'inicio',
+      productos: 'catalogo',
+      servicios: 'servicios',
+      proceso: 'servicios',
+      nosotros: 'nosotros',
+      faq: 'nosotros',
+      contacto: 'contacto',
+    };
+    const sections = Object.keys(sectionToKey)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (nav.dataset.current === 'inicio' && sections.length) {
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        const line = window.innerHeight * 0.35;
+        let current = sections[0];
+        for (const sec of sections) if (sec.getBoundingClientRect().top <= line) current = sec;
+        // Al llegar al final de la página, activar la última sección
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) current = sections[sections.length - 1];
+        setActive(byKey(sectionToKey[current.id]));
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      }, { passive: true });
+      update();
+    }
+
+    // Posición inicial sin animación, y recalcular al cambiar tamaño/fuentes
+    indicator.style.transition = 'none';
+    moveTo(active);
+    requestAnimationFrame(() => indicator.style.removeProperty('transition'));
+    window.addEventListener('resize', () => moveTo(active));
+    document.fonts?.ready.then(() => moveTo(active));
+  }
+</script>

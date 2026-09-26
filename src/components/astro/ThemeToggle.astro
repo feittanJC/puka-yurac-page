@@ -1,0 +1,52 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Cambiar a modo oscuro"
+  class:list={[
+    'inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[10px] ui-text-primary transition-colors hover:bg-(--bg-elevated)',
+    className,
+  ]}
+>
+  <!-- Sol (visible en modo oscuro) -->
+  <svg class="hidden h-5 w-5 dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+  </svg>
+  <!-- Luna (visible en modo claro) -->
+  <svg class="block h-5 w-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+
+  const syncLabels = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    buttons.forEach((b) => b.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'));
+  };
+
+  const applyTheme = (theme: string) => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {
+      /* almacenamiento bloqueado: el tema solo dura esta visita */
+    }
+    syncLabels();
+  };
+
+  syncLabels();
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    })
+  );
+</script>

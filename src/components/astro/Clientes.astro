@@ -1,0 +1,65 @@
+---
+const clientWorkSamples = [
+  { name: "Agendas Corporativas Tapa Dura", category: "Encuadernación Premium", img: "/assets/cuaderno.jpg" },
+  { name: "Cuadernos Anillados Doble Ring", category: "Papelería Corporativa", img: "/assets/anillado.jpg" },
+  { name: "Folletos & Trípticos Couché", category: "Publicidad Offset", img: "/assets/folleto.jpg" },
+  { name: "Calendarios de Escritorio", category: "Merchandising de Fin de Año", img: "/assets/calendario.jpg" },
+  { name: "Agendas de Cuero de Lujo", category: "Grabado en Pan de Oro", img: "/assets/agenda.png" },
+  { name: "Facturas & Talonarios", category: "Imprenta Autocopiativa", img: "/assets/facturas.png" },
+];
+
+// Duplicate array 3x for smooth infinite marquee loop
+const marqueeItems = [...clientWorkSamples, ...clientWorkSamples, ...clientWorkSamples];
+---
+
+<section id="clientes" class="py-24 ui-elevated-bg border-t border-b ui-border overflow-hidden relative transition-colors">
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
+    <span class="editorial-tag inline-block mb-3">Producción Real en Taller</span>
+    <h2 class="text-3xl sm:text-5xl font-extrabold ui-text-primary tracking-tight">
+      Muestras de Trabajos <span class="text-gradient-red">Recientes</span>
+    </h2>
+    <p class="ui-text-secondary text-sm sm:text-base max-w-xl mx-auto mt-2">
+      Pasa el cursor para pausar la galería y examinar los detalles de acabado de nuestros impresos reales.
+    </p>
+  </div>
+
+  <!-- Marquee Container (Fixed Card Background & Clean Fade Vignette) -->
+  <div class="relative w-full overflow-hidden py-4">
+    
+    <!-- Fade vignette left & right matching --bg-elevated -->
+    <div class="pointer-events-none absolute left-0 top-0 z-20 h-full w-16 sm:w-32 bg-gradient-to-r from-[var(--bg-elevated)] to-transparent"></div>
+    <div class="pointer-events-none absolute right-0 top-0 z-20 h-full w-16 sm:w-32 bg-gradient-to-l from-[var(--bg-elevated)] to-transparent"></div>
+
+    <div class="marquee-track gap-6 px-4">
+      {marqueeItems.map((item) => (
+        <div class="flex-shrink-0 w-80 paper-card p-4 border ui-border group cursor-pointer">
+          <div class="w-full h-44 overflow-hidden rounded-xl bg-zinc-950 relative mb-4">
+            <img
+              src={item.img}
+              alt={item.name}
+              class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+            />
+            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded bg-zinc-950/80 text-white backdrop-blur-md border border-zinc-700">
+              {item.category}
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold ui-text-primary group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                {item.name}
+              </h3>
+              <span class="text-[11px] ui-text-tertiary font-mono block mt-0.5">Taller Puka Yurac Breña</span>
+            </div>
+            <span class="material-symbols-outlined text-red-600 text-lg group-hover:translate-x-1 transition-transform">
+              arrow_forward
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+
+</section>

@@ -1,0 +1,85 @@
+---
+import { siteData } from '../data/siteData';
+import WhatsAppButton from '../components/astro/WhatsAppButton.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Imagen LCP a precargar (solo la landing) */
+  preloadImage?: string;
+}
+
+const {
+  title = `${siteData.name} | Imprenta y taller gráfico en Breña, Lima`,
+  description = siteData.description,
+  preloadImage,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Aplica el tema antes de pintar (evita parpadeo) -->
+    <script is:inline>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch (e) {}
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      })();
+    </script>
+
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content={siteData.developer} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/assets/fotos/cuaderno.webp" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Manrope:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
+  </head>
+  <body class="ui-page-bg ui-text-primary antialiased selection:bg-red-600 selection:text-white">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-(--text-primary) focus:px-4 focus:py-3 focus:text-(--bg-page)"
+    >
+      Saltar al contenido
+    </a>
+    <slot />
+    <WhatsAppButton />
+    <script is:inline>
+      // Secciones que aparecen al hacer scroll. Sin IntersectionObserver o con movimiento reducido, todo queda visible.
+      (function () {
+        if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var els = document.querySelectorAll('main > section:not(:first-child), main section [data-reveal-item]');
+        if (!els.length) return;
+        document.documentElement.classList.add('js-reveal');
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+        els.forEach(function (el) { el.setAttribute('data-reveal', ''); io.observe(el); });
+        // Al imprimir, mostrar todo
+        window.addEventListener('beforeprint', function () { els.forEach(function (el) { el.classList.add('is-visible'); }); });
+      })();
+    </script>
+  </body>
+</html>

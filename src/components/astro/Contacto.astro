@@ -1,0 +1,84 @@
+---
+import { siteData, whatsappUrl } from '../../data/siteData';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+
+const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteData.mapQuery)}&z=17&output=embed`;
+
+const datos = [
+  { label: 'Dirección', value: siteData.address },
+  { label: 'Horario', value: siteData.hours },
+  { label: 'Envíos', value: 'A todo el Perú' },
+];
+---
+
+<section id="contacto" aria-labelledby="cont-title" class="mt-[72px] border-t ui-border lg:mt-28">
+  <div class="container-page grid gap-7 pt-16 pb-[72px] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20 lg:pt-24 lg:pb-28">
+    <div>
+      <p class="text-sm font-semibold ui-text-secondary lg:text-[15px]">Contacto</p>
+      <h2
+        id="cont-title"
+        class="mt-3 mb-6 text-[30px] leading-[1.08] font-extrabold tracking-[-0.03em] lg:mt-4 lg:mb-8 lg:text-[44px] lg:leading-[1.05]"
+      >
+        Cuéntanos <span class="text-gradient-red">qué</span> necesitas imprimir.
+      </h2>
+      <a
+        href={siteData.phoneHref}
+        aria-label={`Llamar al ${siteData.phone}`}
+        class="block rounded font-sans text-5xl leading-none font-extrabold tracking-[-0.035em] tabular-nums ui-text-primary [font-stretch:112%] lg:text-[72px]"
+      >
+        {siteData.phoneShort}
+      </a>
+      <p class="mt-2 text-sm ui-text-secondary lg:mt-2.5 lg:text-[15px]">Teléfono y WhatsApp · +51</p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-7 lg:mt-9">
+        <a
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-anim inline-flex h-14 items-center justify-center gap-2.5 rounded-xl bg-(--whatsapp) px-6 text-base font-bold text-white transition-colors hover:bg-[#065f46]"
+        >
+          <WhatsAppIcon />
+          Escríbenos por WhatsApp
+        </a>
+        <a
+          href={siteData.phoneHref}
+          class="link-anim inline-flex h-13 items-center justify-center rounded text-base font-bold ui-text-primary sm:h-14"
+        >
+          Llamar
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <dl class="border-t ui-border md:grid md:grid-cols-[140px_minmax(0,1fr)]">
+        {datos.map((d) => (
+          <div class="border-b ui-border py-4 md:contents">
+            <dt class="text-sm font-semibold ui-text-secondary md:border-b md:ui-border md:py-5 md:text-[15px]">{d.label}</dt>
+            <dd class="mt-1 text-[17px] font-semibold ui-text-primary md:mt-0 md:border-b md:ui-border md:py-5 md:text-lg">
+              {d.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="mt-6 overflow-hidden rounded-2xl border ui-border lg:mt-7 lg:rounded-[20px]">
+        <iframe
+          src={mapEmbedUrl}
+          title={`Mapa: ${siteData.address}`}
+          class="block h-[260px] w-full border-0 lg:h-[300px]"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <a
+        href={siteData.googleMapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-anim link-anim--accent mt-3 inline-flex min-h-11 items-center rounded text-[15px] font-bold ui-text-primary"
+      >
+        Cómo llegar
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+import FaqAccordion from './FaqAccordion.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { whatsappUrl } from '../../data/siteData';
+---
+
+<section id="faq" aria-labelledby="faq-title" class="container-page pt-[72px] lg:pt-28">
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <h2 id="faq-title" class="text-[34px] leading-[1.02] font-extrabold tracking-[-0.03em] lg:text-[52px] lg:leading-none">
+        Preguntas <span class="text-gradient-red">frecuentes</span>
+      </h2>
+      <p class="mt-3 max-w-[340px] text-base leading-[1.55] ui-text-secondary lg:mt-5 lg:text-[17px]">
+        ¿Tienes otra duda? Escríbenos y te respondemos en horario de atención.
+      </p>
+      <a
+        href={whatsappUrl('Hola Puka & Yurac, tengo una consulta:')}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-anim mt-6 hidden h-12 items-center gap-2.5 rounded-xl bg-(--whatsapp) px-5 text-[15px] font-bold text-white transition-colors hover:bg-[#065f46] lg:inline-flex"
+      >
+        <WhatsAppIcon />
+        Pregúntanos por WhatsApp
+      </a>
+    </div>
+    <FaqAccordion />
+  </div>
+</section>

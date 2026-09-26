@@ -1,0 +1,134 @@
+---
+---
+
+<dialog id="cotizador-modal" class="fixed inset-0 z-50 p-4 bg-transparent backdrop:bg-black/60 backdrop:backdrop-blur-md max-w-lg w-full m-auto border-0">
+  <div class="relative ui-surface-bg border ui-border rounded-3xl p-6 sm:p-8 shadow-2xl ui-text-primary">
+    <button
+      id="close-cotizador-modal"
+      class="absolute top-5 right-5 ui-text-secondary hover:ui-text-primary ui-elevated-bg w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer"
+      aria-label="Cerrar modal"
+    >
+      ✕
+    </button>
+
+    <div class="mb-6">
+      <span class="editorial-tag inline-block mb-2">Cotizador Express</span>
+      <h3 class="text-2xl font-extrabold ui-text-primary">Simula tu Cotización</h3>
+      <p class="ui-text-secondary text-sm mt-1">
+        Selecciona las especificaciones de tu pedido y recibe atención prioritaria en WhatsApp.
+      </p>
+    </div>
+
+    <form id="modal-quote-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold ui-text-secondary uppercase tracking-wider mb-2">
+          Producto o Servicio
+        </label>
+        <select
+          id="modal-producto"
+          class="w-full ui-elevated-bg border ui-border rounded-xl px-4 py-3 ui-text-primary focus:outline-none focus:border-red-500 transition"
+        >
+          <option value="Agendas Corporativas">Agendas Corporativas</option>
+          <option value="Cuadernos Personalizados">Cuadernos Personalizados</option>
+          <option value="Facturas y Talonarios">Facturas y Talonarios</option>
+          <option value="Folletos, Trípticos y Afiches">Folletos, Trípticos y Afiches</option>
+          <option value="Calendarios de Escritorio/Pared">Calendarios de Escritorio/Pared</option>
+          <option value="Tarjetas de Presentación">Tarjetas de Presentación</option>
+          <option value="Otro Proyecto Personalizado">Otro Proyecto Personalizado</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold ui-text-secondary uppercase tracking-wider mb-2">
+            Cantidad Aproximada
+          </label>
+          <select
+            id="modal-cantidad"
+            class="w-full ui-elevated-bg border ui-border rounded-xl px-4 py-3 ui-text-primary focus:outline-none focus:border-red-500 transition"
+          >
+            <option value="50">50 unidades</option>
+            <option value="100">100 unidades</option>
+            <option value="250">250 unidades</option>
+            <option value="500">500 unidades</option>
+            <option value="1000">1,000 unidades</option>
+            <option value="5000+">5,000+ (Gran Tiraje)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold ui-text-secondary uppercase tracking-wider mb-2">
+            Tipo de Acabado
+          </label>
+          <select
+            id="modal-acabado"
+            class="w-full ui-elevated-bg border ui-border rounded-xl px-4 py-3 ui-text-primary focus:outline-none focus:border-red-500 transition"
+          >
+            <option value="Tapa Dura empastada">Tapa Dura Empastada</option>
+            <option value="Anillado Doble Ring">Anillado Doble Ring</option>
+            <option value="Plastificado Mate/Brillo">Plastificado Mate/Brillo</option>
+            <option value="Grabado Pan de Oro/Plata">Grabado Pan de Oro/Plata</option>
+            <option value="Económico Estándar">Económico Estándar</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold ui-text-secondary uppercase tracking-wider mb-2">
+          Detalles Adicionales (Opcional)
+        </label>
+        <textarea
+          id="modal-detalles"
+          placeholder="Ej. Medidas especiales, número de páginas, fecha límite..."
+          rows="3"
+          class="w-full ui-elevated-bg border ui-border rounded-xl p-3 ui-text-primary placeholder:text-zinc-400 focus:outline-none focus:border-red-500 transition text-sm"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer border border-red-500/50"
+      >
+        <span>Enviar Cotización a WhatsApp</span>
+        <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  import { siteData } from '../../data/siteData';
+
+  const modal = document.getElementById('cotizador-modal') as HTMLDialogElement;
+  const closeBtn = document.getElementById('close-cotizador-modal');
+  const form = document.getElementById('modal-quote-form');
+
+  closeBtn?.addEventListener('click', () => {
+    modal?.close();
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const producto = (document.getElementById('modal-producto') as HTMLSelectElement)?.value;
+    const cantidad = (document.getElementById('modal-cantidad') as HTMLSelectElement)?.value;
+    const acabado = (document.getElementById('modal-acabado') as HTMLSelectElement)?.value;
+    const detalles = (document.getElementById('modal-detalles') as HTMLTextAreaElement)?.value;
+
+    const mensaje = `Hola Puka Yurac, solicito cotización:
+📌 *Producto:* ${producto}
+🔢 *Cantidad:* ${cantidad} unidades
+✨ *Acabado:* ${acabado}
+📝 *Detalles:* ${detalles || 'Ninguno'}`;
+
+    const url = `https://wa.me/${siteData.whatsappNumber}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+    modal?.close();
+  });
+
+  // Export helper to open modal globally
+  (window as any).openCotizadorModal = () => {
+    modal?.showModal();
+  };
+</script>
