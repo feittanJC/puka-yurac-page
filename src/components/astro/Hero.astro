@@ -1,5 +1,5 @@
 ---
-import { siteData, whatsappUrl } from '../../data/siteData';
+import { siteData } from '../../data/siteData';
 
 const categorias = siteData.categorias.map((c, i) => ({
   ...c,
@@ -27,9 +27,7 @@ const categorias = siteData.categorias.map((c, i) => ({
 
       <div class="mt-7 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-8 lg:mt-10">
         <a
-          href={whatsappUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#cotizar"
           class="btn-anim inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-(--action) px-7 text-base font-bold text-white transition-colors hover:bg-(--action-hover)"
         >
           Cotizar ahora

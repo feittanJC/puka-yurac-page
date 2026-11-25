@@ -1,0 +1,323 @@
+---
+import { siteData, whatsappUrl } from '../../data/siteData';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+
+/** Cantidades sugeridas por producto (la primera de la lista central queda preseleccionada). */
+const PRESETS: Record<string, number[]> = {
+  'Agendas corporativas': [50, 100, 250],
+  'Cuadernos personalizados': [100, 250, 500],
+  'Facturas y talonarios': [10, 25, 50],
+  'Folletos y afiches': [500, 1000, 2500],
+  Calendarios: [50, 100, 250],
+  'Agendas de cuero': [25, 50, 100],
+};
+const DEFAULT_PRESETS = [50, 100, 250];
+
+const productos = siteData.categorias.map((c) => ({
+  nombre: c.nombre,
+  presets: PRESETS[c.nombre] ?? DEFAULT_PRESETS,
+}));
+const inicial = productos[0];
+
+const entregas = ['Recojo en el taller (Breña)', 'Delivery en Lima', 'Envío a provincia'];
+const MAX_COMENTARIO = 240;
+
+const inputCls =
+  'block w-full min-h-12 rounded-xl border border-(--border-input) ui-surface-bg px-4 text-base ui-text-primary placeholder:ui-text-tertiary';
+const labelCls = 'mb-2 block text-[15px] font-semibold ui-text-primary';
+const pillCls =
+  'inline-flex min-h-11 cursor-pointer items-center rounded-full border ui-border px-4 text-[15px] font-semibold transition-colors';
+---
+
+<section id="cotizar" aria-labelledby="cot-title" class="container-page pt-[72px] lg:pt-28">
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+    <div>
+      <p class="text-sm font-semibold ui-text-secondary lg:text-[15px]">Cotizador</p>
+      <h2 id="cot-title" class="mt-3 text-[34px] leading-[1.05] font-extrabold tracking-[-0.03em] lg:mt-4 lg:text-[52px]">
+        Arma tu pedido en un minuto
+      </h2>
+    </div>
+    <p class="max-w-[440px] text-base leading-[1.55] ui-text-secondary lg:text-[17px]">
+      Elige el producto, la cantidad y para cuándo lo necesitas. Te enviamos el mensaje listo por WhatsApp y te
+      respondemos con precio y prueba.
+    </p>
+  </div>
+
+  <div class="cot-grid mt-10 grid gap-10 lg:mt-14">
+    <form data-cotizador class="flex flex-col gap-8" novalidate>
+      <fieldset>
+        <legend class={labelCls}>Producto</legend>
+        <div class="flex flex-wrap gap-2">
+          {productos.map((p, i) => (
+            <label class:list={[pillCls, 'cot-pill']}>
+              <input
+                type="radio"
+                name="producto"
+                value={p.nombre}
+                checked={i === 0}
+                data-presets={p.presets.join(',')}
+                class="sr-only"
+              />
+              {p.nombre}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div>
+        <label for="cot-cantidad" class={labelCls}>Cantidad (unidades)</label>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input
+            id="cot-cantidad"
+            name="cantidad"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            required
+            value={inicial.presets[1]}
+            aria-describedby="cot-cantidad-error"
+            class:list={[inputCls, 'sm:max-w-[180px] tabular-nums']}
+          />
+          <div class="flex flex-wrap gap-2" role="group" aria-label="Cantidades sugeridas" data-presets-wrap>
+            {inicial.presets.map((n) => (
+              <button type="button" data-preset={n} aria-pressed={n === inicial.presets[1] ? 'true' : 'false'} class:list={[pillCls, 'cot-preset tabular-nums']}>
+                {n.toLocaleString('es-PE')}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p id="cot-cantidad-error" class="mt-2 text-sm font-semibold text-(--accent-text)" hidden>
+          Ingresa una cantidad de 1 o más unidades.
+        </p>
+      </div>
+
+      <div class="grid gap-8 sm:grid-cols-2 sm:gap-6">
+        <div>
+          <label for="cot-fecha" class={labelCls}>¿Para cuándo lo necesitas?</label>
+          <input id="cot-fecha" name="fecha" type="date" class={inputCls} />
+        </div>
+        <div>
+          <label for="cot-entrega" class={labelCls}>Entrega</label>
+          <select id="cot-entrega" name="entrega" class:list={[inputCls, 'cursor-pointer']}>
+            {entregas.map((e) => <option value={e}>{e}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="cot-comentario" class={labelCls}>
+          Comentario <span class="font-normal ui-text-tertiary">(opcional)</span>
+        </label>
+        <textarea
+          id="cot-comentario"
+          name="comentario"
+          rows="3"
+          maxlength={MAX_COMENTARIO}
+          placeholder="Medidas, acabados, colores o si ya tienes el diseño."
+          aria-describedby="cot-comentario-count"
+          class:list={[inputCls, 'py-3 leading-[1.5]']}
+        ></textarea>
+        <p id="cot-comentario-count" class="mt-1.5 text-right text-sm tabular-nums ui-text-tertiary">
+          <span data-count>0</span>/{MAX_COMENTARIO}
+        </p>
+      </div>
+
+      <div>
+        <label for="cot-nombre" class={labelCls}>
+          Nombre o empresa <span class="font-normal ui-text-tertiary">(opcional)</span>
+        </label>
+        <input id="cot-nombre" name="nombre" type="text" maxlength="80" autocomplete="organization" class={inputCls} />
+      </div>
+    </form>
+
+    <aside aria-labelledby="cot-resumen-title" class="cot-summary">
+      <div class="rounded-[20px] ui-elevated-bg p-6 lg:p-8">
+        <h3 id="cot-resumen-title" class="text-[22px] leading-[1.2] font-bold [font-stretch:106%] lg:text-2xl">
+          Orden de cotización
+        </h3>
+
+        <dl class="mt-5 divide-y ui-border border-y ui-border text-[15px]">
+          {[
+            ['producto', 'Producto'],
+            ['cantidad', 'Cantidad'],
+            ['fecha', 'Fecha deseada'],
+            ['entrega', 'Entrega'],
+            ['comentario', 'Comentario'],
+            ['nombre', 'Nombre o empresa'],
+          ].map(([key, label]) => (
+            <div class="flex justify-between gap-4 py-3">
+              <dt class="shrink-0 ui-text-secondary">{label}</dt>
+              <dd class="min-w-0 text-right font-semibold break-words" data-sum={key}>Sin indicar</dd>
+            </div>
+          ))}
+        </dl>
+
+        <p class="mt-6 mb-2 text-sm font-semibold ui-text-secondary">Mensaje que se enviará</p>
+        <p
+          data-preview
+          aria-live="polite"
+          class="rounded-2xl rounded-tr-sm bg-(--bg-plate) p-4 text-[15px] leading-[1.55] whitespace-pre-line text-[#0f1115]"
+        ></p>
+
+        <a
+          data-send
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-anim mt-6 flex h-14 items-center justify-center gap-2.5 rounded-xl bg-(--whatsapp) px-6 text-base font-bold text-white transition-colors hover:bg-[#065f46] aria-disabled:pointer-events-none aria-disabled:opacity-50"
+        >
+          <WhatsAppIcon />
+          Enviar por WhatsApp
+        </a>
+        <p class="mt-3 text-center text-sm ui-text-tertiary">Se abre WhatsApp con el mensaje; tú decides si lo envías.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .cot-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 820px) {
+    .cot-grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      align-items: start;
+    }
+    .cot-summary {
+      position: sticky;
+      top: 112px;
+    }
+  }
+  .cot-pill:has(input:checked),
+  .cot-preset[aria-pressed='true'] {
+    background-color: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-page);
+  }
+  .cot-pill:not(:has(input:checked)):hover,
+  .cot-preset[aria-pressed='false']:hover {
+    background-color: var(--bg-elevated);
+  }
+  .cot-pill:has(input:focus-visible) {
+    outline: 2px solid var(--action);
+    outline-offset: 3px;
+  }
+</style>
+
+<script>
+  import { siteData, whatsappUrl } from '../../data/siteData';
+
+  const form = document.querySelector<HTMLFormElement>('[data-cotizador]');
+  if (form) {
+    const qty = form.querySelector<HTMLInputElement>('#cot-cantidad')!;
+    const qtyError = form.querySelector<HTMLElement>('#cot-cantidad-error')!;
+    const fecha = form.querySelector<HTMLInputElement>('#cot-fecha')!;
+    const entrega = form.querySelector<HTMLSelectElement>('#cot-entrega')!;
+    const comentario = form.querySelector<HTMLTextAreaElement>('#cot-comentario')!;
+    const nombre = form.querySelector<HTMLInputElement>('#cot-nombre')!;
+    const count = form.querySelector<HTMLElement>('[data-count]')!;
+    const presetsWrap = form.querySelector<HTMLElement>('[data-presets-wrap]')!;
+    const preview = document.querySelector<HTMLElement>('[data-preview]')!;
+    const send = document.querySelector<HTMLAnchorElement>('[data-send]')!;
+    const sum = (key: string) => document.querySelector<HTMLElement>(`[data-sum="${key}"]`)!;
+
+    // Fechas en hora local (el sitio es estático: se calculan en el navegador)
+    const iso = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const hoy = new Date();
+    const en14 = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 14);
+    fecha.min = iso(hoy);
+    fecha.value = iso(en14);
+
+    const fmtFecha = (v: string) => {
+      if (!v) return '';
+      const [y, m, d] = v.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    const productoActual = () => form.querySelector<HTMLInputElement>('input[name="producto"]:checked');
+
+    function renderPresets() {
+      const input = productoActual();
+      const presets = (input?.dataset.presets ?? '').split(',').map(Number).filter(Boolean);
+      const buttons = presetsWrap.querySelectorAll<HTMLButtonElement>('[data-preset]');
+      buttons.forEach((b, i) => {
+        const n = presets[i];
+        b.hidden = !n;
+        if (n) {
+          b.dataset.preset = String(n);
+          b.textContent = n.toLocaleString('es-PE');
+        }
+      });
+      if (presets[1]) qty.value = String(presets[1]);
+    }
+
+    function update() {
+      const producto = productoActual()?.value ?? '';
+      const n = Number(qty.value);
+      const qtyOk = Number.isInteger(n) && n >= 1;
+      const values: Record<string, string> = {
+        producto,
+        cantidad: qtyOk ? `${n.toLocaleString('es-PE')} ${n === 1 ? 'unidad' : 'unidades'}` : '',
+        fecha: fmtFecha(fecha.value),
+        entrega: entrega.value,
+        comentario: comentario.value.trim(),
+        nombre: nombre.value.trim(),
+      };
+
+      for (const [key, val] of Object.entries(values)) {
+        const el = sum(key);
+        el.textContent = val || 'Sin indicar';
+        el.classList.toggle('ui-text-tertiary', !val);
+        el.classList.toggle('font-normal', !val);
+      }
+
+      presetsWrap.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) => {
+        b.setAttribute('aria-pressed', String(Number(b.dataset.preset) === n));
+      });
+      count.textContent = String(comentario.value.length);
+
+      const lineas = [
+        `Hola ${siteData.name.replace(' Impresiones', '')}, quiero cotizar:`,
+        `• Producto: ${values.producto}`,
+        `• Cantidad: ${values.cantidad || 'por definir'}`,
+        values.fecha && `• Fecha deseada: ${values.fecha}`,
+        `• Entrega: ${values.entrega}`,
+        values.comentario && `• Comentario: ${values.comentario}`,
+        values.nombre && `• Nombre o empresa: ${values.nombre}`,
+      ].filter(Boolean) as string[];
+      const msg = lineas.join('\n');
+      preview.textContent = msg;
+
+      // Mostrar el error solo cuando el usuario ya escribió algo inválido
+      qtyError.hidden = qtyOk || qty.value === '';
+      qty.setAttribute('aria-invalid', String(!qtyOk));
+      if (qtyOk) {
+        send.href = whatsappUrl(msg);
+        send.removeAttribute('aria-disabled');
+        send.removeAttribute('tabindex');
+      } else {
+        send.removeAttribute('href');
+        send.setAttribute('aria-disabled', 'true');
+        send.setAttribute('tabindex', '-1');
+      }
+    }
+
+    form.addEventListener('change', (e) => {
+      if ((e.target as HTMLInputElement).name === 'producto') renderPresets();
+      update();
+    });
+    form.addEventListener('input', update);
+    presetsWrap.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-preset]');
+      if (!b) return;
+      qty.value = b.dataset.preset ?? '';
+      update();
+    });
+    form.addEventListener('submit', (e) => e.preventDefault());
+
+    update();
+  }
+</script>

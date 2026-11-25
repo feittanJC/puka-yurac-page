@@ -1,11 +1,10 @@
 ---
-import { siteData, whatsappUrl } from '../../data/siteData';
+import { siteData } from '../../data/siteData';
 import ThemeToggle from './ThemeToggle.astro';
 import NavbarMobile from './NavbarMobile.astro';
 import Logo from './Logo.astro';
-import WhatsAppIcon from './WhatsAppIcon.astro';
 
-export type NavKey = 'inicio' | 'nosotros' | 'catalogo' | 'servicios' | 'contacto';
+export type NavKey = 'inicio' | 'nosotros' | 'catalogo' | 'servicios' | 'cotizar' | 'contacto';
 
 interface Props {
   /** Página actual para marcar el enlace activo */
@@ -22,6 +21,7 @@ const links: { href: string; label: string; key?: NavKey }[] = [
   { href: onHome ? '#inicio' : '/', label: 'Inicio', key: 'inicio' },
   { href: onHome ? '#productos' : onCatalog ? '#contenido' : '/productos', label: 'Catálogo', key: 'catalogo' },
   { href: onHome ? '#servicios' : '/#servicios', label: 'Servicios', key: 'servicios' },
+  { href: onHome ? '#cotizar' : '/#cotizar', label: 'Cotizar', key: 'cotizar' },
   { href: onHome ? '#nosotros' : '/#nosotros', label: 'Nosotros', key: 'nosotros' },
   { href: onHome ? '#contacto' : '/#contacto', label: 'Contacto', key: 'contacto' },
 ];
@@ -69,13 +69,10 @@ const links: { href: string; label: string; key?: NavKey }[] = [
         <ThemeToggle />
       </div>
       <a
-        href={whatsappUrl()}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-anim hidden h-12 items-center gap-2.5 rounded-xl bg-(--whatsapp) px-5 text-[15px] font-bold text-white transition-colors hover:bg-[#065f46] lg:inline-flex"
+        href={onHome ? '#cotizar' : '/#cotizar'}
+        class="btn-anim hidden h-12 items-center rounded-xl bg-(--action) px-5 text-[15px] font-bold text-white transition-colors hover:bg-(--action-hover) lg:inline-flex"
       >
-        <WhatsAppIcon />
-        Escríbenos
+        Cotizar
       </a>
       <NavbarMobile links={links} current={current} />
     </div>
@@ -137,6 +134,7 @@ const links: { href: string; label: string; key?: NavKey }[] = [
       productos: 'catalogo',
       servicios: 'servicios',
       proceso: 'servicios',
+      cotizar: 'cotizar',
       nosotros: 'nosotros',
       faq: 'nosotros',
       contacto: 'contacto',
