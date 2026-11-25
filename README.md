@@ -57,7 +57,7 @@ Agrega estos secrets en GitHub (Settings → Secrets and variables → Actions):
 
 ## Cambiar el dominio
 
-El sitio usa `https://puka-yurac-page.josuecastillom07.workers.dev` para el sitemap, la URL canónica y las vistas previas al compartir. Cuando compres tu dominio, cámbialo en dos lugares:
+El sitio usa `https://puka-yurac-page.pukayurac.workers.dev` para el sitemap, la URL canónica y las vistas previas al compartir. Cuando compres tu dominio, cámbialo en dos lugares:
 
 1. `astro.config.mjs` → `site`
 2. `public/robots.txt` → línea `Sitemap:`

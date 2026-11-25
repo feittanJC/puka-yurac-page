@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // Cambiar por tu dominio cuando lo compres (y actualizar public/robots.txt)
-  site: 'https://puka-yurac-page.josuecastillom07.workers.dev',
+  site: 'https://puka-yurac-page.pukayurac.workers.dev',
   integrations: [
     react(),
     sitemap({
