@@ -1,0 +1,6 @@
+# Cambiar el dominio del Sitemap cuando compres tu dominio (igual que `site` en astro.config.mjs)
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://puka-yurac.pages.dev/sitemap-index.xml

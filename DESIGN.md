@@ -5,9 +5,12 @@
 - **Inspiración:** Catálogos de imprenta de alta gama, revistas de diseño gráfico, muestras táctiles de papel, pan de oro y encuadernación.
 
 ## 🔴 Palette & Color Rules
-- **Base Background:** Tono carbón editorial limpio (`#121316` / `#18191d`). Nunca negro puro (`#000000`) ni azul neón.
-- **Brand Accent:** Rojo Puka Yurac (`#dc2626` / `#b91c1c`) usado en acciones clave, etiquetas y acentos tipográficos. Jamás como luces desenfocadas o aros brillantes tipo SaaS.
-- **Superficies y Bordes:** Tarjetas de papel (`#1a1b20`) con bordes sutiles (`#2a2c34`) y separación clara.
+Dirección editorial clara (rediseño 2026). Tokens en `src/styles/global.css`.
+- **Base (tema por defecto, claro):** fondo papel `--bg-page #f8f8f6`, superficies `--bg-surface #ffffff`, tinta `--text-primary #0f1115`, texto secundario `#4a4d52`, terciario `#5f6268`. Bordes `--border-main #dcdce0`, solo cuando separan.
+- **Plano de foto:** `--bg-plate #efede6` (en oscuro `#e9e6de`, sigue claro). Las fotos van sobre `.photo-plate` con `mix-blend-mode: multiply`.
+- **Acción / marca:** rojo Puka Yurac `--action #dc2626`, hover `--action-hover #b91c1c`, para CTA, enlaces activos, números del índice y foco (outline 2px, offset 3px). Bloque de acento `--accent-block #e60000`. Jamás como luces desenfocadas o aros brillantes tipo SaaS.
+- **Otros:** WhatsApp `--whatsapp #047857`, footer `--footer-bg #09090b`, borde de inputs `--border-input #8a8d93`.
+- **Modo oscuro (opcional):** se activa con el toggle o `prefers-color-scheme`. Base carbón `--bg-page #0f1115`, superficie `#16181d`, texto `#f0f1f5`, bordes `#2b2e36`, acento de texto `#ef4444`. Nunca negro puro ni azul neón.
 
 ## 🔤 Typography
 - **Titulares:** `Archivo` (700–800, ancho 112% vía `font-stretch`, tracking ajustado). Grotesca de origen editorial/impreso.

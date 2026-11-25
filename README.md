@@ -1,43 +1,65 @@
-# Astro Starter Kit: Minimal
+# Puka & Yurac Impresiones
+
+Sitio web de Puka & Yurac, imprenta y taller gráfico en Breña, Lima. Incluye la landing, el catálogo de productos (`/productos`) y un panel de administración (`/admin`) para gestionar el catálogo.
+
+## Stack
+
+- [Astro 7](https://astro.build) (sitio estático) con islas de React 19
+- Tailwind CSS 4
+- [Supabase](https://supabase.com): base de datos, Auth (panel admin) y Storage (imágenes de productos). Esquema en `supabase/schema.sql`.
+- `@astrojs/sitemap` para el sitemap
+
+## Configuración
+
+Requiere Node 22.12 o superior.
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+cp .env.example .env
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Completa `.env` con los datos de tu proyecto de Supabase (Project Settings → API):
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```
+PUBLIC_SUPABASE_URL=https://TU-PROYECTO.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Usa solo la clave `anon` pública. Nunca pongas la `service_role` en el proyecto. `.env` no se sube al repositorio.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Comandos
 
-Any static assets, like images, can be placed in the `public/` directory.
+| Comando           | Acción                                     |
+| ----------------- | ------------------------------------------ |
+| `npm run dev`     | Servidor local en `http://localhost:4321`  |
+| `npm run build`   | Genera el sitio en `dist/`                 |
+| `npm run preview` | Sirve `dist/` localmente para revisarlo    |
 
-## 🧞 Commands
+## Deploy en Cloudflare Pages
 
-All commands are run from the root of the project, from a terminal:
+1. Conecta el repositorio en Cloudflare Pages.
+2. Configuración de build:
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+3. Variables de entorno:
+   - `PUBLIC_SUPABASE_URL`
+   - `PUBLIC_SUPABASE_ANON_KEY`
+   - `NODE_VERSION` = `22`
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Supabase keep-alive
 
-## 👀 Want to learn more?
+Los proyectos gratuitos de Supabase se pausan tras días sin actividad. El workflow `.github/workflows/supabase-keepalive.yml` hace una consulta cada 3 días (también se puede lanzar a mano desde la pestaña Actions).
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Agrega estos secrets en GitHub (Settings → Secrets and variables → Actions):
+
+- `SUPABASE_URL`: la URL del proyecto, por ejemplo `https://TU-PROYECTO.supabase.co`
+- `SUPABASE_ANON_KEY`: la clave `anon` pública
+
+## Cambiar el dominio
+
+El sitio usa `https://puka-yurac.pages.dev` para el sitemap, la URL canónica y las vistas previas al compartir. Cuando compres tu dominio, cámbialo en dos lugares:
+
+1. `astro.config.mjs` → `site`
+2. `public/robots.txt` → línea `Sitemap:`
+
+Luego vuelve a desplegar.

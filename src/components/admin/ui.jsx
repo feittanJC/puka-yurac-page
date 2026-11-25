@@ -1,5 +1,6 @@
 // Primitivas compartidas del panel admin (rediseño 2026).
 // Colores vía tokens de global.css para que claro/oscuro cumplan AA.
+import { imagenOptimizada } from '../../lib/imagen';
 
 export const cls = {
   // Botón principal rojo (acción)
@@ -102,7 +103,7 @@ export function Plate({ src, alt = '', className = '', padding = 'p-1.5', radius
   return (
     <div className={`flex items-center justify-center bg-[var(--bg-plate)] ${radius} ${padding} ${className}`}>
       {src ? (
-        <img src={src} alt={alt} className="block max-w-full max-h-full object-contain mix-blend-multiply" />
+        <img src={imagenOptimizada(src)} alt={alt} className="block max-w-full max-h-full object-contain mix-blend-multiply" />
       ) : (
         children
       )}

@@ -15,6 +15,29 @@ const {
   description = siteData.description,
   preloadImage,
 } = Astro.props;
+
+// URLs absolutas para vistas previas (WhatsApp, Facebook) y buscadores. El dominio sale de `site` en astro.config.mjs.
+const siteUrl = (Astro.site ?? new URL(Astro.url.origin)).href;
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = new URL('/assets/fotos/cuaderno.webp', siteUrl).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: siteData.name,
+  description: siteData.description,
+  telephone: siteData.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Jr. Orbegozo 645',
+    addressLocality: 'Breña',
+    addressRegion: 'Lima',
+    addressCountry: 'PE',
+  },
+  openingHours: 'Mo-Sa 08:30-19:00',
+  url: siteUrl,
+  image: ogImage,
+};
 ---
 
 <!doctype html>
@@ -45,7 +68,13 @@ const {
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/assets/fotos/cuaderno.webp" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:site_name" content={siteData.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href={canonicalUrl} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
