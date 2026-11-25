@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://puka-yurac.pages.dev/sitemap-index.xml
+Sitemap: https://puka-yurac-page.josuecastillom07.workers.dev/sitemap-index.xml
