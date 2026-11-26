@@ -5,6 +5,9 @@ import Footer from '../components/astro/Footer.astro';
 import ProductGrid from '../components/astro/ProductGrid.astro';
 import WhatsAppIcon from '../components/astro/WhatsAppIcon.astro';
 import { siteData, whatsappUrl } from '../data/siteData';
+import { cargarNegocio } from '../lib/contenido';
+
+await cargarNegocio();
 ---
 
 <Layout

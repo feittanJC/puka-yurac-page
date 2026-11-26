@@ -10,6 +10,11 @@ import QuienesSomos from '../components/astro/QuienesSomos.astro';
 import FaqSection from '../components/astro/FaqSection.astro';
 import Contacto from '../components/astro/Contacto.astro';
 import Footer from '../components/astro/Footer.astro';
+import Trabajos from '../components/astro/Trabajos.astro';
+import { cargarNegocio } from '../lib/contenido';
+
+// Datos del negocio desde Supabase antes de renderizar (respaldo: src/data/siteData.js)
+await cargarNegocio();
 ---
 
 <Layout preloadImage="/assets/fotos/cuaderno.webp">
@@ -20,6 +25,7 @@ import Footer from '../components/astro/Footer.astro';
     <Servicios />
     <Proceso />
     <Cotizador />
+    <Trabajos />
     <QuienesSomos />
     <FaqSection />
     <Contacto />

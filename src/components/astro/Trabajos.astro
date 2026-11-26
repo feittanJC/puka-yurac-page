@@ -1,0 +1,257 @@
+---
+import { trabajosService } from '../../services/contenido.service';
+import { imagenOptimizada } from '../../lib/imagen';
+
+export interface Trabajo {
+  id: number;
+  titulo: string;
+  cliente: string | null;
+  categoria: string | null;
+  descripcion: string | null;
+  imagen: string | null;
+  spec: string | null;
+  destacado: boolean;
+}
+
+// Panel admin → Trabajos. En build se leen de Supabase y en el navegador se refrescan.
+// Sin trabajos publicados la sección no se muestra.
+const ordenar = (lista: Trabajo[]) => [...lista].sort((a, b) => Number(b.destacado) - Number(a.destacado));
+const trabajos = ordenar(((await trabajosService.getPublic()) ?? []) as Trabajo[]);
+const categorias = [...new Set(trabajos.map((t) => t.categoria).filter(Boolean))] as string[];
+
+const navBtn =
+  'trab-nav inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border ui-border ui-text-primary transition-colors hover:bg-(--bg-elevated) disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent';
+const pillCls =
+  'trab-filter inline-flex h-11 shrink-0 cursor-pointer items-center rounded-full px-4 text-[15px] font-semibold transition-colors aria-pressed:bg-(--text-primary) aria-pressed:text-(--bg-page) aria-[pressed=false]:ui-text-secondary aria-[pressed=false]:hover:bg-(--bg-elevated) aria-[pressed=false]:hover:ui-text-primary';
+---
+
+<section
+  id="trabajos"
+  aria-labelledby="trab-title"
+  class="container-page pt-[72px] lg:pt-28"
+  data-trabajos
+  hidden={trabajos.length === 0}
+>
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+    <div>
+      <p class="text-sm font-semibold ui-text-secondary lg:text-[15px]">Trabajos realizados</p>
+      <h2 id="trab-title" class="mt-3 text-[34px] leading-[1.05] font-extrabold tracking-[-0.03em] lg:mt-4 lg:text-[52px]">
+        Trabajos que salieron del <span class="text-gradient-red">taller</span>
+      </h2>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" class={navBtn} data-dir="-1" aria-label="Trabajo anterior">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+      </button>
+      <button type="button" class={navBtn} data-dir="1" aria-label="Trabajo siguiente">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div role="group" aria-label="Filtrar trabajos por categoría" class="trab-filters mt-6 flex gap-1 overflow-x-auto lg:mt-8" hidden={categorias.length < 2}>
+    {['Todos', ...categorias].map((c, i) => (
+      <button type="button" data-filter={c} aria-pressed={i === 0 ? 'true' : 'false'} class={pillCls}>{c}</button>
+    ))}
+  </div>
+
+  <div
+    class="trab-scroller mt-6 overflow-x-auto pb-4 lg:mt-8"
+    role="region"
+    aria-label="Galería de trabajos. Usa las flechas del teclado para recorrerla."
+    tabindex="0"
+  >
+    <ul class="trab-list flex gap-5 lg:gap-8">
+      {trabajos.map((t) => (
+        <li class="trab-card" data-categoria={t.categoria ?? ''}>
+          <figure class="m-0">
+            {t.imagen ? (
+              <div class="trab-plate photo-plate h-[280px] rounded-2xl! p-6! lg:h-[360px] lg:rounded-[20px]! lg:p-9!">
+                <img class="trab-img" src={imagenOptimizada(t.imagen)} alt={t.titulo} width="800" height="600" loading="lazy" decoding="async" />
+              </div>
+            ) : (
+              <div class="trab-plate-empty photo-plate photo-plate--empty h-[280px] rounded-2xl! p-6! lg:h-[360px] lg:rounded-[20px]! lg:p-8!">
+                <span class="trab-empty-name font-sans text-[28px] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#3a3c40] [font-stretch:112%]" aria-hidden="true">{t.titulo}</span>
+              </div>
+            )}
+            <figcaption>
+              <p class="trab-cliente mt-4 mb-1 text-sm font-semibold ui-text-tertiary lg:mt-5" hidden={!t.cliente}>{t.cliente}</p>
+              <h3 class="trab-titulo text-[22px] leading-[1.2] font-bold [font-stretch:106%] lg:text-2xl">{t.titulo}</h3>
+              <p class="trab-desc mt-2 text-base leading-[1.55] ui-text-secondary" hidden={!t.descripcion}>{t.descripcion}</p>
+              <p class="trab-spec mt-2.5 font-mono text-[13px] ui-text-secondary" hidden={!t.spec}>{t.spec}</p>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <template class="trab-template">
+    <li class="trab-card" data-categoria="">
+      <figure class="m-0">
+        <div class="trab-plate photo-plate h-[280px] rounded-2xl! p-6! lg:h-[360px] lg:rounded-[20px]! lg:p-9!">
+          <img class="trab-img" alt="" width="800" height="600" loading="lazy" decoding="async" />
+        </div>
+        <div class="trab-plate-empty photo-plate photo-plate--empty h-[280px] rounded-2xl! p-6! lg:h-[360px] lg:rounded-[20px]! lg:p-8!">
+          <span class="trab-empty-name font-sans text-[28px] leading-[1.05] font-extrabold tracking-[-0.03em] text-[#3a3c40] [font-stretch:112%]" aria-hidden="true"></span>
+        </div>
+        <figcaption>
+          <p class="trab-cliente mt-4 mb-1 text-sm font-semibold ui-text-tertiary lg:mt-5"></p>
+          <h3 class="trab-titulo text-[22px] leading-[1.2] font-bold [font-stretch:106%] lg:text-2xl"></h3>
+          <p class="trab-desc mt-2 text-base leading-[1.55] ui-text-secondary"></p>
+          <p class="trab-spec mt-2.5 font-mono text-[13px] ui-text-secondary"></p>
+        </figcaption>
+      </figure>
+    </li>
+  </template>
+</section>
+
+<style>
+  .trab-scroller {
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+  }
+  .trab-scroller:focus-visible {
+    outline: 2px solid var(--action);
+    outline-offset: 4px;
+    border-radius: 12px;
+  }
+  .trab-card {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+  @media (min-width: 640px) {
+    .trab-card { flex-basis: calc((100% - 20px) / 2); }
+  }
+  @media (min-width: 1024px) {
+    .trab-card { flex-basis: calc((100% - 64px) / 3); }
+  }
+  .trab-card[hidden] { display: none; }
+  .trab-filters { scrollbar-width: none; }
+</style>
+
+<script>
+  import { trabajosService } from '../../services/contenido.service';
+  import { imagenOptimizada } from '../../lib/imagen';
+
+  type Trabajo = {
+    titulo: string;
+    cliente: string | null;
+    categoria: string | null;
+    descripcion: string | null;
+    imagen: string | null;
+    spec: string | null;
+    destacado: boolean;
+  };
+
+  const section = document.querySelector<HTMLElement>('[data-trabajos]');
+  if (section) {
+    const scroller = section.querySelector<HTMLElement>('.trab-scroller')!;
+    const list = section.querySelector<HTMLUListElement>('.trab-list')!;
+    const filters = section.querySelector<HTMLElement>('.trab-filters')!;
+    const template = section.querySelector<HTMLTemplateElement>('.trab-template')!;
+    const prev = section.querySelector<HTMLButtonElement>('[data-dir="-1"]')!;
+    const next = section.querySelector<HTMLButtonElement>('[data-dir="1"]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let activo = 'Todos';
+
+    const visibles = () => [...list.querySelectorAll<HTMLElement>('.trab-card:not([hidden])')];
+
+    function paso() {
+      const card = visibles()[0];
+      if (!card) return scroller.clientWidth;
+      const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+      return card.offsetWidth + gap;
+    }
+
+    function mover(dir: number) {
+      scroller.scrollBy({ left: dir * paso(), behavior: reduce ? 'auto' : 'smooth' });
+    }
+
+    function actualizarNav() {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      prev.disabled = scroller.scrollLeft <= 2;
+      next.disabled = scroller.scrollLeft >= max - 2;
+    }
+
+    function aplicarFiltro(cat: string) {
+      activo = cat;
+      filters.querySelectorAll<HTMLButtonElement>('.trab-filter').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.dataset.filter === cat));
+      });
+      list.querySelectorAll<HTMLElement>('.trab-card').forEach((li) => {
+        li.hidden = cat !== 'Todos' && li.dataset.categoria !== cat;
+      });
+      scroller.scrollLeft = 0;
+      actualizarNav();
+    }
+
+    function renderFiltros(cats: string[]) {
+      const molde = filters.querySelector<HTMLButtonElement>('.trab-filter')!;
+      const botones = ['Todos', ...cats].map((c) => {
+        const b = molde.cloneNode(true) as HTMLButtonElement;
+        b.dataset.filter = c;
+        b.textContent = c;
+        return b;
+      });
+      filters.replaceChildren(...botones);
+      filters.hidden = cats.length < 2;
+    }
+
+    function fillCard(t: Trabajo) {
+      const li = (template.content.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement;
+      li.dataset.categoria = t.categoria ?? '';
+      const src = imagenOptimizada(t.imagen);
+      const plate = li.querySelector<HTMLElement>('.trab-plate')!;
+      const empty = li.querySelector<HTMLElement>('.trab-plate-empty')!;
+      if (src) {
+        empty.remove();
+        const img = li.querySelector<HTMLImageElement>('.trab-img')!;
+        img.src = src;
+        img.alt = t.titulo;
+      } else {
+        plate.remove();
+        li.querySelector('.trab-empty-name')!.textContent = t.titulo;
+      }
+      const set = (sel: string, val: string | null) => {
+        const el = li.querySelector<HTMLElement>(sel)!;
+        el.textContent = val ?? '';
+        el.hidden = !val;
+      };
+      set('.trab-cliente', t.cliente);
+      set('.trab-titulo', t.titulo);
+      set('.trab-desc', t.descripcion);
+      set('.trab-spec', t.spec);
+      return li;
+    }
+
+    async function refresh() {
+      const data = (await trabajosService.getPublic()) as Trabajo[] | null;
+      if (!data) return; // error de red: se queda lo del build
+      const trabajos = [...data].sort((a, b) => Number(b.destacado) - Number(a.destacado));
+      section!.hidden = trabajos.length === 0;
+      list.replaceChildren(...trabajos.map(fillCard));
+      const cats = [...new Set(trabajos.map((t) => t.categoria).filter(Boolean))] as string[];
+      renderFiltros(cats);
+      aplicarFiltro(cats.includes(activo) ? activo : 'Todos');
+    }
+
+    prev.addEventListener('click', () => mover(-1));
+    next.addEventListener('click', () => mover(1));
+    scroller.addEventListener('scroll', actualizarNav, { passive: true });
+    window.addEventListener('resize', actualizarNav);
+    scroller.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); mover(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); mover(-1); }
+    });
+    filters.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.trab-filter');
+      if (b) aplicarFiltro(b.dataset.filter ?? 'Todos');
+    });
+
+    actualizarNav();
+    refresh().catch(() => {});
+  }
+</script>

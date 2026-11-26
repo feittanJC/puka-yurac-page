@@ -62,7 +62,7 @@ const links: { href: string; label: string; key?: NavKey }[] = [
         href={siteData.phoneHref}
         class="inline-flex min-h-11 items-center rounded px-2 text-sm font-bold tabular-nums ui-text-primary lg:hidden"
       >
-        {siteData.phoneShort}
+        <span data-neg="phoneShort">{siteData.phoneShort}</span>
       </a>
 
       <div class="hidden lg:block">

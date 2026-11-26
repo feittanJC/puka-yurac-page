@@ -60,7 +60,7 @@ const { links, current } = Astro.props;
         Escríbenos por WhatsApp
       </a>
       <a href={siteData.phoneHref} class="flex h-13 items-center justify-center text-base font-bold ui-text-primary underline underline-offset-[6px]">
-        Llamar al {siteData.phoneShort}
+        Llamar al <span data-neg="phoneShort">{siteData.phoneShort}</span>
       </a>
     </div>
 

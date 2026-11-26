@@ -34,10 +34,10 @@ const year = new Date().getFullYear();
 
       <div class="text-[15px] leading-[1.8] text-[#b0b2b8]">
         <a href={siteData.phoneHref} class="inline-flex min-h-11 items-center rounded text-lg font-bold text-[#f0f1f5] lg:min-h-0">
-          {siteData.phone}
+          <span data-neg="phone">{siteData.phone}</span>
         </a>
-        <span class="block">{siteData.address}</span>
-        <span class="block">{siteData.hoursShort}</span>
+        <span class="block" data-neg="address">{siteData.address}</span>
+        <span class="block" data-neg="hoursShort">{siteData.hoursShort}</span>
       </div>
     </div>
 

@@ -12,6 +12,7 @@ export const siteData = {
   googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Jir%C3%B3n%20General%20Orbegoso%20645%2C%20Bre%C3%B1a%2015083%2C%20Lima%2C%20Per%C3%BA",
   hours: "Lunes a sábado, 8:30 a. m. – 7:00 p. m.",
   hoursShort: "Lun – Sáb · 8:30 a. m. – 7:00 p. m.",
+  envios: "A todo el Perú",
   developer: "Josue Castillo",
 
   /** Índice "Qué imprimimos" del hero. `nombre` es el valor que se pasa a /productos?cat= */
@@ -61,4 +62,39 @@ export function whatsappUrl(text = siteData.whatsappMessage) {
 /** Mensaje para cotizar un producto concreto. */
 export function whatsappProductoUrl(titulo) {
   return whatsappUrl(`Hola Puka & Yurac, quiero cotizar este producto: ${titulo}.`);
+}
+
+/**
+ * Datos de contacto derivados de una fila de la tabla `negocio` (panel admin → Datos del negocio).
+ * Devuelve solo los campos de siteData que cambian; los vacíos se ignoran.
+ */
+export function negocioToSiteData(row) {
+  if (!row) return {};
+  const out = {};
+  const phone = (row.phone ?? '').trim();
+  if (phone) {
+    out.phone = phone;
+    out.phoneShort = phone.replace(/^\+51\s*/, '');
+    out.phoneHref = `tel:${phone.replace(/[^\d+]/g, '')}`;
+  }
+  const wa = (row.whatsapp_number ?? '').replace(/\D/g, '');
+  if (wa) out.whatsappNumber = wa;
+  if (row.whatsapp_message?.trim()) out.whatsappMessage = row.whatsapp_message.trim();
+  if (row.address?.trim()) out.address = row.address.trim();
+  const mapQuery = row.map_query?.trim() || out.address;
+  if (mapQuery) {
+    out.mapQuery = mapQuery;
+    out.googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+  }
+  if (row.hours?.trim()) out.hours = row.hours.trim();
+  if (row.hours_short?.trim()) out.hoursShort = row.hours_short.trim();
+  if (row.envios?.trim()) out.envios = row.envios.trim();
+  return out;
+}
+
+/** Aplica los datos del negocio sobre siteData (en el build y en el navegador). */
+export function aplicarNegocio(row) {
+  const cambios = negocioToSiteData(row);
+  Object.assign(siteData, cambios);
+  return cambios;
 }

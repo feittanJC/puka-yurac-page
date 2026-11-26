@@ -57,11 +57,12 @@ export const productosService = {
   },
 
   /**
-   * Upload product image to Storage, returns public URL (Protected Admin)
+   * Upload product image to Storage, returns public URL (Protected Admin).
+   * `folder` opcional (p. ej. "trabajos") para agrupar fotos de otras secciones.
    */
-  async uploadImagen(file) {
+  async uploadImagen(file, folder = '') {
     const ext = file.name.split('.').pop();
-    const path = `${crypto.randomUUID()}.${ext}`;
+    const path = `${folder ? `${folder}/` : ''}${crypto.randomUUID()}.${ext}`;
 
     const { error } = await supabase.storage.from(BUCKET).upload(path, file);
     if (error) throw error;

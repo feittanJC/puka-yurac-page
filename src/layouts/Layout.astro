@@ -93,6 +93,10 @@ const jsonLd = {
     </a>
     <slot />
     <WhatsAppButton />
+    <script>
+      // Teléfono, WhatsApp, dirección y horario editables desde el panel admin
+      import '../lib/negocio-client';
+    </script>
     <script is:inline>
       // Secciones que aparecen al hacer scroll. Sin IntersectionObserver o con movimiento reducido, todo queda visible.
       (function () {

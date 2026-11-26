@@ -5,9 +5,9 @@ import WhatsAppIcon from './WhatsAppIcon.astro';
 const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(siteData.mapQuery)}&z=17&output=embed`;
 
 const datos = [
-  { label: 'Dirección', value: siteData.address },
-  { label: 'Horario', value: siteData.hours },
-  { label: 'Envíos', value: 'A todo el Perú' },
+  { label: 'Dirección', value: siteData.address, key: 'address' },
+  { label: 'Horario', value: siteData.hours, key: 'hours' },
+  { label: 'Envíos', value: siteData.envios, key: 'envios' },
 ];
 ---
 
@@ -24,9 +24,10 @@ const datos = [
       <a
         href={siteData.phoneHref}
         aria-label={`Llamar al ${siteData.phone}`}
+        data-neg-call
         class="block rounded font-sans text-5xl leading-none font-extrabold tracking-[-0.035em] tabular-nums ui-text-primary [font-stretch:112%] lg:text-[72px]"
       >
-        {siteData.phoneShort}
+        <span data-neg="phoneShort">{siteData.phoneShort}</span>
       </a>
       <p class="mt-2 text-sm ui-text-secondary lg:mt-2.5 lg:text-[15px]">Teléfono y WhatsApp · +51</p>
 
@@ -54,7 +55,7 @@ const datos = [
         {datos.map((d) => (
           <div class="border-b ui-border py-4 md:contents">
             <dt class="text-sm font-semibold ui-text-secondary md:border-b md:ui-border md:py-5 md:text-[15px]">{d.label}</dt>
-            <dd class="mt-1 text-[17px] font-semibold ui-text-primary md:mt-0 md:border-b md:ui-border md:py-5 md:text-lg">
+            <dd data-neg={d.key} class="mt-1 text-[17px] font-semibold ui-text-primary md:mt-0 md:border-b md:ui-border md:py-5 md:text-lg">
               {d.value}
             </dd>
           </div>
@@ -64,6 +65,7 @@ const datos = [
       <div class="mt-6 overflow-hidden rounded-2xl border ui-border lg:mt-7 lg:rounded-[20px]">
         <iframe
           src={mapEmbedUrl}
+          data-neg-map
           title={`Mapa: ${siteData.address}`}
           class="block h-[260px] w-full border-0 lg:h-[300px]"
           loading="lazy"
@@ -73,6 +75,7 @@ const datos = [
       </div>
       <a
         href={siteData.googleMapsUrl}
+        data-neg-href="googleMapsUrl"
         target="_blank"
         rel="noopener noreferrer"
         class="link-anim link-anim--accent mt-3 inline-flex min-h-11 items-center rounded text-[15px] font-bold ui-text-primary"
