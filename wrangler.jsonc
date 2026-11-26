@@ -1,0 +1,11 @@
+// Configuración del Worker de Cloudflare que sirve el sitio estático (salida de `npm run build`).
+// Tenerla en el repo hace que funcionen tanto el deploy de producción (master)
+// como las URLs de vista previa de otras ramas.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "puka-yurac-page",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
