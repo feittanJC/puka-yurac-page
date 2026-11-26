@@ -60,3 +60,16 @@ export const negocioService = {
     return data;
   },
 };
+
+export const categoriasService = {
+  ...crud('categorias'),
+  /** Cuántos productos usan esta categoría (para avisar antes de borrarla). */
+  async contarProductos(nombre) {
+    const { count, error } = await supabase
+      .from('productos')
+      .select('id', { count: 'exact', head: true })
+      .eq('categoria', nombre);
+    if (error) throw error;
+    return count ?? 0;
+  },
+};

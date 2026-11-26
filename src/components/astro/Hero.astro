@@ -1,11 +1,14 @@
 ---
-import { siteData } from '../../data/siteData';
+import { cargarCategorias, hrefCategoria } from '../../lib/categorias';
 
-const categorias = siteData.categorias.map((c, i) => ({
-  ...c,
-  n: String(i + 1).padStart(2, '0'),
-  href: `/productos?cat=${encodeURIComponent(c.nombre)}`,
-}));
+// Panel admin → Categorías (las marcadas "mostrar en inicio"); respaldo: siteData.categorias
+const categorias = (await cargarCategorias())
+  .filter((c) => c.mostrar_en_inicio)
+  .map((c, i) => ({
+    ...c,
+    n: String(i + 1).padStart(2, '0'),
+    href: hrefCategoria(c.nombre),
+  }));
 ---
 
 <section id="inicio" aria-labelledby="hero-title" class="container-page pt-8 lg:pt-[72px]">
@@ -66,10 +69,10 @@ const categorias = siteData.categorias.map((c, i) => ({
         href="/productos"
         class="link-anim hidden rounded text-[15px] font-bold ui-text-primary md:inline"
       >
-        Ver las {categorias.length} categorías
+        Ver las <span data-cat-total>{categorias.length}</span> categorías
       </a>
     </div>
-    <ol class="grid border-b border-(--text-primary) md:grid-cols-2 md:gap-x-12 md:border-b-0 lg:grid-cols-3">
+    <ol data-cat-index class="grid border-b border-(--text-primary) md:grid-cols-2 md:gap-x-12 md:border-b-0 lg:grid-cols-3">
       {categorias.map((c) => (
         <li class="border-t border-(--text-primary)">
           <a
@@ -81,10 +84,40 @@ const categorias = siteData.categorias.map((c, i) => ({
               {c.nombre}
             </span>
             <span></span>
-            <span class="font-mono text-[12.5px] ui-text-tertiary lg:text-[13px]">{c.spec}</span>
+            <span class="cat-spec font-mono text-[12.5px] ui-text-tertiary lg:text-[13px]">{c.spec}</span>
           </a>
         </li>
       ))}
     </ol>
   </div>
 </section>
+
+<script>
+  // Refresca el índice con las categorías actuales del panel (sin esperar a un nuevo deploy)
+  import { categoriasService } from '../../services/contenido.service';
+  import { desdeFilas, hrefCategoria } from '../../lib/categorias';
+
+  const ol = document.querySelector<HTMLOListElement>('[data-cat-index]');
+  const molde = ol?.querySelector('li');
+  if (ol && molde) {
+    categoriasService
+      .getPublic()
+      .then((rows) => {
+        const cats = desdeFilas(rows)?.filter((c) => c.mostrar_en_inicio);
+        if (!cats?.length) return;
+        ol.replaceChildren(
+          ...cats.map((c, i) => {
+            const li = molde.cloneNode(true) as HTMLLIElement;
+            li.querySelector('a')!.href = hrefCategoria(c.nombre);
+            li.querySelector('.cat-num')!.textContent = String(i + 1).padStart(2, '0');
+            li.querySelector('.cat-name')!.textContent = c.nombre;
+            li.querySelector('.cat-spec')!.textContent = c.spec;
+            return li;
+          })
+        );
+        const total = document.querySelector('[data-cat-total]');
+        if (total) total.textContent = String(cats.length);
+      })
+      .catch(() => {});
+  }
+</script>

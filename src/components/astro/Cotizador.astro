@@ -1,22 +1,10 @@
 ---
-import { siteData, whatsappUrl } from '../../data/siteData';
+import { whatsappUrl } from '../../data/siteData';
+import { cargarCategorias } from '../../lib/categorias';
 import WhatsAppIcon from './WhatsAppIcon.astro';
 
-/** Cantidades sugeridas por producto (la primera de la lista central queda preseleccionada). */
-const PRESETS: Record<string, number[]> = {
-  'Agendas corporativas': [50, 100, 250],
-  'Cuadernos personalizados': [100, 250, 500],
-  'Facturas y talonarios': [10, 25, 50],
-  'Folletos y afiches': [500, 1000, 2500],
-  Calendarios: [50, 100, 250],
-  'Agendas de cuero': [25, 50, 100],
-};
-const DEFAULT_PRESETS = [50, 100, 250];
-
-const productos = siteData.categorias.map((c) => ({
-  nombre: c.nombre,
-  presets: PRESETS[c.nombre] ?? DEFAULT_PRESETS,
-}));
+/** Tipos de producto y cantidades sugeridas: panel admin → Categorías (respaldo: siteData). La cantidad central queda preseleccionada. */
+const productos = (await cargarCategorias()).map((c) => ({ nombre: c.nombre, presets: c.cantidades }));
 const inicial = productos[0];
 
 const entregas = ['Recojo en el taller (Breña)', 'Delivery en Lima', 'Envío a provincia'];
@@ -47,7 +35,7 @@ const pillCls =
     <form data-cotizador class="flex flex-col gap-8" novalidate>
       <fieldset>
         <legend class={labelCls}>Producto</legend>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2" data-pills>
           {productos.map((p, i) => (
             <label class:list={[pillCls, 'cot-pill']}>
               <input
@@ -58,7 +46,7 @@ const pillCls =
                 data-presets={p.presets.join(',')}
                 class="sr-only"
               />
-              {p.nombre}
+              <span class="cot-pill-name">{p.nombre}</span>
             </label>
           ))}
         </div>
@@ -208,6 +196,8 @@ const pillCls =
 
 <script>
   import { siteData, whatsappUrl } from '../../data/siteData';
+  import { categoriasService } from '../../services/contenido.service';
+  import { desdeFilas } from '../../lib/categorias';
 
   const form = document.querySelector<HTMLFormElement>('[data-cotizador]');
   if (form) {
@@ -360,6 +350,34 @@ const pillCls =
       heading?.focus({ preventScroll: true });
       history.replaceState(null, '', '#cotizar');
     });
+
+    // ---------- Tipos de producto actuales del panel (Categorías) ----------
+    async function refrescarCategorias() {
+      const cats = desdeFilas(await categoriasService.getPublic());
+      const wrap = form!.querySelector<HTMLElement>('[data-pills]');
+      const molde = wrap?.querySelector<HTMLLabelElement>('.cot-pill');
+      if (!cats || !wrap || !molde) return;
+      const elegido = productoActual()?.value;
+      const qtyAntes = qty.value;
+      wrap.replaceChildren(
+        ...cats.map((c) => {
+          const label = molde.cloneNode(true) as HTMLLabelElement;
+          const input = label.querySelector('input')!;
+          input.value = c.nombre;
+          input.dataset.presets = c.cantidades.join(',');
+          input.checked = false;
+          label.querySelector('.cot-pill-name')!.textContent = c.nombre;
+          return label;
+        })
+      );
+      const radios = [...wrap.querySelectorAll<HTMLInputElement>('input[name="producto"]')];
+      (radios.find((r) => r.value === elegido) ?? radios[0]).checked = true;
+      renderPresets();
+      // Conservar la cantidad que el usuario ya escribió si sigue en el mismo producto
+      if (productoActual()?.value === elegido && qtyAntes) qty.value = qtyAntes;
+      update();
+    }
+    refrescarCategorias().catch(() => {});
 
     update();
   }

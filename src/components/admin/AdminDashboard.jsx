@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { productosService } from '../../services/productos.service';
+import { categoriasService } from '../../services/contenido.service';
 import ConfirmDialog from './ConfirmDialog';
 import ProductoForm from './ProductoForm';
 import { siteData } from '../../data/siteData';
@@ -66,13 +67,20 @@ export default function AdminDashboard() {
   }, [notice]);
 
   // ---------- Derivados ----------
-  // Categorías canónicas del hero (enlazan a /productos?cat=) + las que ya existan en productos
+  // Categorías del panel (pestaña Categorías; respaldo: siteData) + las que ya existan en productos
+  const [catalogo, setCatalogo] = useState(() => siteData.categorias.map((c) => c.nombre));
+  useEffect(() => {
+    categoriasService
+      .getAdmin()
+      .then((rows) => rows?.length && setCatalogo(rows.map((r) => r.nombre)))
+      .catch(() => {});
+  }, []);
   const categorias = useMemo(
     () =>
-      [...new Set([...siteData.categorias.map((c) => c.nombre), ...productos.map((p) => p.categoria).filter(Boolean)])].sort(
+      [...new Set([...catalogo, ...productos.map((p) => p.categoria).filter(Boolean)])].sort(
         (a, b) => a.localeCompare(b, 'es')
       ),
-    [productos]
+    [catalogo, productos]
   );
 
   const acabadosUsados = useMemo(() => {

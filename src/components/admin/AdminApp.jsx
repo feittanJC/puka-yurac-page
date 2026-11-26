@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { authService } from '../../services/auth.service';
 import AdminDashboard from './AdminDashboard';
 import TrabajosAdmin from './TrabajosAdmin';
+import CategoriasAdmin from './CategoriasAdmin';
 import FaqsAdmin from './FaqsAdmin';
 import NegocioForm from './NegocioForm';
 
 const SECCIONES = [
   { id: 'productos', label: 'Productos', title: 'Productos', Component: AdminDashboard },
+  { id: 'categorias', label: 'Categorías', title: 'Categorías', Component: CategoriasAdmin },
   { id: 'trabajos', label: 'Trabajos', title: 'Trabajos realizados', Component: TrabajosAdmin },
   { id: 'faqs', label: 'Preguntas frecuentes', title: 'Preguntas frecuentes', Component: FaqsAdmin },
   { id: 'negocio', label: 'Datos del negocio', title: 'Datos del negocio', Component: NegocioForm },
