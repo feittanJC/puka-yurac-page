@@ -33,12 +33,14 @@ Ejecuta los scripts en Supabase → SQL Editor → New query, en este orden y un
 
 1. `supabase/schema.sql`: tabla de productos, administradores y bucket de imágenes.
 2. `supabase/migrations/002_contenido.sql`: datos del negocio, preguntas frecuentes y trabajos realizados. Solo agrega tablas; no modifica las anteriores.
+3. `supabase/migrations/003_categorias.sql`: categorías (tipos de producto) del índice "Qué imprimimos" y del cotizador.
 
 ## Panel admin
 
-Entra en `/admin/login` con un usuario registrado en la tabla `admins` (ver el final de `schema.sql`). El panel tiene cuatro secciones:
+Entra en `/admin/login` con un usuario registrado en la tabla `admins` (ver el final de `schema.sql`). El panel tiene cinco secciones:
 
 - **Productos**: catálogo (`/productos` y destacados de la página de inicio).
+- **Categorías**: tipos de producto del índice "Qué imprimimos" y del cotizador, con sus cantidades sugeridas.
 - **Trabajos**: galería "Trabajos que salieron del taller". Si no hay trabajos publicados, la sección no aparece.
 - **Preguntas frecuentes**: con orden y publicación.
 - **Datos del negocio**: teléfono, WhatsApp, dirección, horario y envíos que se muestran en todo el sitio.
