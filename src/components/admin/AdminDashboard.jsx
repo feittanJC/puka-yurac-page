@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { authService } from '../../services/auth.service';
 import { productosService } from '../../services/productos.service';
 import ConfirmDialog from './ConfirmDialog';
 import ProductoForm from './ProductoForm';
@@ -42,16 +41,9 @@ export default function AdminDashboard() {
   const panelRef = useRef(null);
   const newBtnRef = useRef(null);
 
-  // Auth guard: sin sesión de admin, volver al login
+  // La sesión de admin ya la verificó AdminApp
   useEffect(() => {
-    (async () => {
-      const session = await authService.getSession();
-      if (!session || !(await authService.isAdmin())) {
-        window.location.href = '/admin/login';
-        return;
-      }
-      loadProductos();
-    })();
+    loadProductos();
   }, []);
 
   async function loadProductos() {
