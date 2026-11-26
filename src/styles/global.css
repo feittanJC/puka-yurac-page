@@ -239,7 +239,12 @@
 
 /* Los anclajes (#servicios, #contacto…) no quedan tapados por el header fijo */
 section[id] {
-  scroll-margin-top: 88px;
+  scroll-margin-top: 68px; /* alto del header en móvil */
+}
+@media (min-width: 1024px) {
+  section[id] {
+    scroll-margin-top: 88px; /* alto del header en escritorio */
+  }
 }
 
 /* Tarjeta de producto sin foto: plano con el nombre */

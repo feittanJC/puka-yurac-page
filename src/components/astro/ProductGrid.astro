@@ -99,7 +99,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? 'producto' : 'productos'}`;
   import { productosService } from '../../services/productos.service';
   import { selectProductos, type GridMode } from '../../lib/productos';
   import { imagenOptimizada } from '../../lib/imagen';
-  import { whatsappProductoUrl } from '../../data/siteData';
+  import { cotizarProductoUrl } from '../../data/siteData';
   import type { Producto } from '../../types/producto';
 
   const countLabel = (n: number) => `${n} ${n === 1 ? 'producto' : 'productos'}`;
@@ -135,8 +135,10 @@ const countLabel = (n: number) => `${n} ${n === 1 ? 'producto' : 'productos'}`;
 
     const cta = card.querySelector<HTMLAnchorElement>('.card-cta');
     if (cta) {
-      cta.href = whatsappProductoUrl(p.titulo);
-      cta.setAttribute('aria-label', `Cotizar este producto: ${p.titulo}, por WhatsApp`);
+      cta.href = cotizarProductoUrl(p.titulo, p.categoria);
+      cta.dataset.producto = p.titulo;
+      cta.dataset.cat = p.categoria;
+      cta.setAttribute('aria-label', `Cotizar este producto: ${p.titulo}`);
     }
 
     const li = document.createElement('li');

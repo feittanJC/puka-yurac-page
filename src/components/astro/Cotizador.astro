@@ -318,6 +318,49 @@ const pillCls =
     });
     form.addEventListener('submit', (e) => e.preventDefault());
 
+    // ---------- Preselección desde "Cotizar este producto" ----------
+    const normalizar = (s: string) =>
+      s.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+
+    /** Marca el tipo de producto que coincide con la categoría (o el título); si no hay, anota el producto en el comentario. */
+    function preseleccionar(categoria: string, titulo: string) {
+      const radios = [...form!.querySelectorAll<HTMLInputElement>('input[name="producto"]')];
+      const match =
+        radios.find((r) => categoria && normalizar(r.value) === normalizar(categoria)) ??
+        radios.find((r) => titulo && normalizar(r.value) === normalizar(titulo));
+      if (match) {
+        match.checked = true;
+        renderPresets();
+      }
+      if (titulo && (!match || normalizar(match.value) !== normalizar(titulo))) {
+        comentario.value = `Producto del catálogo: ${titulo}`.slice(0, comentario.maxLength > 0 ? comentario.maxLength : 240);
+      }
+      update();
+    }
+
+    const section = document.getElementById('cotizar');
+    const heading = document.getElementById('cot-title');
+
+    // Llegada desde otra página: /?cat=…&producto=…#cotizar
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('cat') || params.has('producto')) {
+      preseleccionar(params.get('cat') ?? '', params.get('producto') ?? '');
+      history.replaceState(null, '', `${window.location.pathname}#cotizar`);
+    }
+
+    // En la misma página: sin recargar, solo bajar al cotizador
+    document.addEventListener('click', (e) => {
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-cotizar]');
+      if (!a || !section) return;
+      e.preventDefault();
+      preseleccionar(a.dataset.cat ?? '', a.dataset.producto ?? '');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      section.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+      heading?.setAttribute('tabindex', '-1');
+      heading?.focus({ preventScroll: true });
+      history.replaceState(null, '', '#cotizar');
+    });
+
     update();
   }
 </script>

@@ -1,6 +1,6 @@
 ---
 import type { Producto } from '../../types/producto';
-import { whatsappProductoUrl } from '../../data/siteData';
+import { cotizarProductoUrl } from '../../data/siteData';
 import { imagenOptimizada } from '../../lib/imagen';
 
 interface Props {
@@ -40,10 +40,11 @@ const plateHeight = variant === 'catalogo' ? 'lg:h-[320px]' : 'lg:h-[360px]';
     <span class="card-spec font-mono text-[13px] ui-text-secondary">{spec}</span>
     <a
       class="card-cta link-anim link-anim--accent inline-flex min-h-12 items-center rounded text-base font-bold ui-text-primary lg:min-h-11 lg:text-[15px]"
-      href={whatsappProductoUrl(p.titulo)}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Cotizar este producto: ${p.titulo}, por WhatsApp`}
+      href={cotizarProductoUrl(p.titulo, p.categoria)}
+      data-cotizar
+      data-producto={p.titulo}
+      data-cat={p.categoria}
+      aria-label={`Cotizar este producto: ${p.titulo}`}
     >
       Cotizar este producto
     </a>

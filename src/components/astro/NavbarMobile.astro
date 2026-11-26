@@ -39,6 +39,7 @@ const { links, current } = Astro.props;
           <li class="border-t ui-border">
             <a
               href={l.href}
+              data-key={l.key}
               aria-current={l.key && l.key === current ? 'page' : undefined}
               class="mobile-nav-link flex min-h-14 items-center font-sans text-[22px] font-bold ui-text-primary [font-stretch:106%] aria-[current=page]:underline aria-[current=page]:decoration-(--accent-text) aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8"
             >

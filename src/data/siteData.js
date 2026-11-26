@@ -98,3 +98,11 @@ export function aplicarNegocio(row) {
   Object.assign(siteData, cambios);
   return cambios;
 }
+
+/** Enlace al cotizador de la página de inicio con el producto preseleccionado. */
+export function cotizarProductoUrl(titulo, categoria = '') {
+  const params = new URLSearchParams();
+  if (categoria) params.set('cat', categoria);
+  if (titulo) params.set('producto', titulo);
+  return `/?${params.toString()}#cotizar`;
+}

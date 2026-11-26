@@ -99,6 +99,12 @@ const links: { href: string; label: string; key?: NavKey }[] = [
     const links = [...nav.querySelectorAll<HTMLAnchorElement>('.nav-link')];
     const byKey = (key: string | null) => links.find((l) => l.dataset.key === key) ?? null;
     let active = byKey(nav.dataset.current ?? null);
+    const mobileLinks = [...document.querySelectorAll<HTMLAnchorElement>('.mobile-nav-link[data-key]')];
+    // Tras un clic el cursor queda quieto sobre el header mientras la página se desplaza:
+    // su :hover ya no representa la intención del usuario hasta que vuelva a mover el mouse.
+    let hoverStale = false;
+    // Mientras dura el desplazamiento suave de un clic, el scroll-spy no cambia el activo.
+    let lockUntil = 0;
 
     const moveTo = (link: HTMLElement | null) => {
       if (!link) {
@@ -115,15 +121,32 @@ const links: { href: string; label: string; key?: NavKey }[] = [
       active?.removeAttribute('aria-current');
       link.setAttribute('aria-current', 'page');
       active = link;
-      if (!nav.matches(':hover')) moveTo(active);
+      mobileLinks.forEach((m) => {
+        if (m.dataset.key === link.dataset.key) m.setAttribute('aria-current', 'page');
+        else m.removeAttribute('aria-current');
+      });
+      if (hoverStale || !nav.matches(':hover')) moveTo(active);
     };
 
     // Hover: la línea se desliza al enlace; al salir vuelve al activo
     links.forEach((l) => {
-      l.addEventListener('mouseenter', () => moveTo(l));
-      l.addEventListener('focus', () => moveTo(l));
+      l.addEventListener('mouseenter', () => {
+        if (!hoverStale) moveTo(l);
+      });
+      l.addEventListener('focus', () => {
+        if (!hoverStale) moveTo(l);
+      });
     });
-    nav.addEventListener('mouseleave', () => moveTo(active));
+    nav.addEventListener('mousemove', (e) => {
+      if (!hoverStale) return;
+      hoverStale = false;
+      const over = (e.target as HTMLElement).closest<HTMLElement>('.nav-link');
+      moveTo(over ?? active);
+    });
+    nav.addEventListener('mouseleave', () => {
+      hoverStale = false;
+      moveTo(active);
+    });
     nav.addEventListener('focusout', (e) => {
       if (!nav.contains(e.relatedTarget as Node)) moveTo(active);
     });
@@ -147,6 +170,7 @@ const links: { href: string; label: string; key?: NavKey }[] = [
       let ticking = false;
       const update = () => {
         ticking = false;
+        if (Date.now() < lockUntil) return;
         const line = window.innerHeight * 0.35;
         let current = sections[0];
         for (const sec of sections) if (sec.getBoundingClientRect().top <= line) current = sec;
@@ -161,6 +185,26 @@ const links: { href: string; label: string; key?: NavKey }[] = [
         }
       }, { passive: true });
       update();
+
+      // Clic en el menú (escritorio o móvil): activo inmediato y fijo hasta que termine el desplazamiento
+      const release = () => {
+        lockUntil = 0;
+        update();
+      };
+      [...links, ...mobileLinks].forEach((l) => {
+        l.addEventListener('click', () => {
+          if (!l.getAttribute('href')?.startsWith('#')) return;
+          hoverStale = true;
+          lockUntil = Date.now() + 1500;
+          const target = byKey(l.dataset.key ?? null);
+          if (target) {
+            setActive(target);
+            moveTo(target);
+          }
+          if ('onscrollend' in window) window.addEventListener('scrollend', release, { once: true });
+          else setTimeout(release, 1500);
+        });
+      });
     }
 
     // Posición inicial sin animación, y recalcular al cambiar tamaño/fuentes
